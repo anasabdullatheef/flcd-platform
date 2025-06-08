@@ -1,0 +1,517 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User Management & Authentication
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  phone     String?  @unique
+  password  String
+  firstName String
+  lastName  String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  userRoles UserRole[]
+  createdRiders Rider[] @relation("CreatedBy")
+  
+  @@map("users")
+}
+
+model Role {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  userRoles   UserRole[]
+  permissions RolePermission[]
+  
+  @@map("roles")
+}
+
+model Permission {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  resource    String   // e.g., "riders", "vehicles", "earnings"
+  action      String   // e.g., "create", "read", "update", "delete"
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  rolePermissions RolePermission[]
+  
+  @@map("permissions")
+}
+
+model UserRole {
+  id     String @id @default(cuid())
+  userId String
+  roleId String
+
+  // Relationships
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roleId])
+  @@map("user_roles")
+}
+
+model RolePermission {
+  id           String @id @default(cuid())
+  roleId       String
+  permissionId String
+
+  // Relationships
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+// Rider Management
+model Rider {
+  id                String    @id @default(cuid())
+  riderCode         String    @unique
+  firstName         String
+  lastName          String
+  email             String?   @unique
+  phone             String    @unique
+  dateOfBirth       DateTime?
+  nationality       String?
+  emiratesId        String?   @unique
+  passportNumber    String?   @unique
+  visaNumber        String?
+  licenseNumber     String?   @unique
+  licenseExpiry     DateTime?
+  emergencyContact  String?
+  emergencyPhone    String?
+  address           String?
+  employmentStatus  RiderEmploymentStatus @default(PENDING)
+  partnerName       String?
+  partnerCode       String?
+  onboardingStatus  OnboardingStatus @default(PENDING)
+  isActive          Boolean   @default(true)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  createdById       String
+
+  // Relationships
+  createdBy            User                   @relation("CreatedBy", fields: [createdById], references: [id])
+  documents            RiderDocument[]
+  acknowledgments      RiderAcknowledgment[]
+  vehicleAssignments   VehicleAssignment[]
+  earnings             Earnings[]
+  deductions           Deduction[]
+  kpiScores            KPIScore[]
+  healthChecks         HealthCheck[]
+  trainingRecords      TrainingRecord[]
+  tickets              Ticket[]
+  
+  @@map("riders")
+}
+
+enum RiderEmploymentStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+  TERMINATED
+}
+
+enum OnboardingStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  REJECTED
+}
+
+model RiderDocument {
+  id         String            @id @default(cuid())
+  riderId    String
+  type       DocumentType
+  fileName   String
+  filePath   String
+  fileSize   Int
+  mimeType   String
+  status     DocumentStatus    @default(PENDING)
+  uploadedAt DateTime          @default(now())
+  verifiedAt DateTime?
+  expiryDate DateTime?
+
+  // Relationships
+  rider Rider @relation(fields: [riderId], references: [id], onDelete: Cascade)
+  
+  @@map("rider_documents")
+}
+
+enum DocumentType {
+  EMIRATES_ID
+  PASSPORT
+  VISA
+  DRIVING_LICENSE
+  PROFILE_PHOTO
+  EMPLOYMENT_CONTRACT
+  BANK_DETAILS
+}
+
+enum DocumentStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+  EXPIRED
+}
+
+// Acknowledgment System
+model RiderAcknowledgment {
+  id              String               @id @default(cuid())
+  riderId         String
+  type            AcknowledgmentType
+  title           String
+  content         String
+  status          AcknowledgmentStatus @default(PENDING)
+  acknowledgedAt  DateTime?
+  signatureData   String?              // Base64 encoded signature
+  createdAt       DateTime             @default(now())
+
+  // Relationships
+  rider Rider @relation(fields: [riderId], references: [id], onDelete: Cascade)
+  
+  @@map("rider_acknowledgments")
+}
+
+enum AcknowledgmentType {
+  VISA_TERMS
+  EMPLOYMENT_TERMS
+  ASSET_ASSIGNMENT
+  ASSET_RETURN
+  FINANCIAL_OBLIGATION
+  INCIDENT_PENALTY
+  TRAINING_COMPLETION
+}
+
+enum AcknowledgmentStatus {
+  PENDING
+  ACKNOWLEDGED
+  OVERDUE
+}
+
+// Vehicle Management
+model Vehicle {
+  id               String           @id @default(cuid())
+  plateNumber      String           @unique
+  make             String
+  model            String
+  year             Int
+  color            String
+  chassisNumber    String           @unique
+  registrationDate DateTime
+  insuranceExpiry  DateTime
+  registrationExpiry DateTime
+  lastMileage      Int              @default(0)
+  status           VehicleStatus    @default(AVAILABLE)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  // Relationships
+  assignments         VehicleAssignment[]
+  documents          VehicleDocument[]
+  maintenanceRecords MaintenanceRecord[]
+  damageReports      DamageReport[]
+  
+  @@map("vehicles")
+}
+
+enum VehicleStatus {
+  AVAILABLE
+  ASSIGNED
+  MAINTENANCE
+  OUT_OF_SERVICE
+}
+
+model VehicleAssignment {
+  id          String    @id @default(cuid())
+  vehicleId   String
+  riderId     String
+  assignedAt  DateTime  @default(now())
+  unassignedAt DateTime?
+  isActive    Boolean   @default(true)
+  notes       String?
+
+  // Relationships
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id])
+  rider   Rider   @relation(fields: [riderId], references: [id])
+  
+  @@map("vehicle_assignments")
+}
+
+model VehicleDocument {
+  id         String            @id @default(cuid())
+  vehicleId  String
+  type       VehicleDocumentType
+  fileName   String
+  filePath   String
+  fileSize   Int
+  mimeType   String
+  uploadedAt DateTime          @default(now())
+  expiryDate DateTime?
+
+  // Relationships
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  
+  @@map("vehicle_documents")
+}
+
+enum VehicleDocumentType {
+  REGISTRATION
+  INSURANCE
+  MULKIYA
+  TECHNICAL_INSPECTION
+  PHOTOS
+}
+
+// Financial Management
+model Earnings {
+  id          String   @id @default(cuid())
+  riderId     String
+  period      String   // e.g., "2024-06"
+  baseAmount  Decimal  @db.Decimal(10, 2)
+  incentives  Decimal  @default(0) @db.Decimal(10, 2)
+  tips        Decimal  @default(0) @db.Decimal(10, 2)
+  totalEarnings Decimal @db.Decimal(10, 2)
+  netAmount   Decimal  @db.Decimal(10, 2)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  rider Rider @relation(fields: [riderId], references: [id], onDelete: Cascade)
+  
+  @@unique([riderId, period])
+  @@map("earnings")
+}
+
+model Deduction {
+  id          String        @id @default(cuid())
+  riderId     String
+  type        DeductionType
+  amount      Decimal       @db.Decimal(10, 2)
+  description String
+  status      DeductionStatus @default(PENDING)
+  dueDate     DateTime?
+  paidDate    DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  // Relationships
+  rider Rider @relation(fields: [riderId], references: [id], onDelete: Cascade)
+  
+  @@map("deductions")
+}
+
+enum DeductionType {
+  TRAFFIC_FINE
+  SALIK_CHARGE
+  PHONE_CHARGE
+  LOAN_REPAYMENT
+  PENALTY
+  MAINTENANCE_COST
+  DAMAGE_COST
+}
+
+enum DeductionStatus {
+  PENDING
+  DEDUCTED
+  PAID
+  WAIVED
+}
+
+// Maintenance & Damage
+model MaintenanceRecord {
+  id           String            @id @default(cuid())
+  vehicleId    String
+  type         MaintenanceType
+  description  String
+  cost         Decimal           @db.Decimal(10, 2)
+  mileage      Int
+  scheduledDate DateTime
+  completedDate DateTime?
+  status       MaintenanceStatus @default(SCHEDULED)
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  // Relationships
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  
+  @@map("maintenance_records")
+}
+
+enum MaintenanceType {
+  REGULAR_SERVICE
+  OIL_CHANGE
+  TIRE_REPLACEMENT
+  BRAKE_SERVICE
+  ENGINE_REPAIR
+  TRANSMISSION_REPAIR
+  ELECTRICAL_REPAIR
+  BODY_REPAIR
+}
+
+enum MaintenanceStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+model DamageReport {
+  id          String       @id @default(cuid())
+  vehicleId   String
+  description String
+  severity    DamageSeverity
+  cost        Decimal?     @db.Decimal(10, 2)
+  reportedAt  DateTime     @default(now())
+  repairedAt  DateTime?
+  status      DamageStatus @default(REPORTED)
+
+  // Relationships
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  
+  @@map("damage_reports")
+}
+
+enum DamageSeverity {
+  MINOR
+  MODERATE
+  MAJOR
+  TOTAL_LOSS
+}
+
+enum DamageStatus {
+  REPORTED
+  UNDER_REPAIR
+  REPAIRED
+  WRITTEN_OFF
+}
+
+// Performance & Analytics
+model KPIScore {
+  id           String   @id @default(cuid())
+  riderId      String
+  period       String   // e.g., "2024-06"
+  punctuality  Decimal  @db.Decimal(3, 2) // 0.00 to 1.00
+  customerRating Decimal @db.Decimal(3, 2) // 0.00 to 5.00
+  deliverySuccess Decimal @db.Decimal(3, 2) // 0.00 to 1.00
+  safetyScore  Decimal  @db.Decimal(3, 2) // 0.00 to 1.00
+  overallScore Decimal  @db.Decimal(3, 2) // 0.00 to 1.00
+  createdAt    DateTime @default(now())
+
+  // Relationships
+  rider Rider @relation(fields: [riderId], references: [id], onDelete: Cascade)
+  
+  @@unique([riderId, period])
+  @@map("kpi_scores")
+}
+
+model HealthCheck {
+  id           String      @id @default(cuid())
+  riderId      String
+  healthScore  Decimal     @db.Decimal(3, 2) // 0.00 to 1.00
+  responses    Json        // Questionnaire responses
+  checkDate    DateTime    @default(now())
+  status       HealthStatus @default(HEALTHY)
+
+  // Relationships
+  rider Rider @relation(fields: [riderId], references: [id], onDelete: Cascade)
+  
+  @@map("health_checks")
+}
+
+enum HealthStatus {
+  HEALTHY
+  AT_RISK
+  REQUIRES_ATTENTION
+}
+
+// Training & Development
+model TrainingRecord {
+  id            String         @id @default(cuid())
+  riderId       String
+  trainingType  String
+  title         String
+  description   String?
+  completedAt   DateTime?
+  score         Decimal?       @db.Decimal(3, 2)
+  status        TrainingStatus @default(ASSIGNED)
+  createdAt     DateTime       @default(now())
+
+  // Relationships
+  rider Rider @relation(fields: [riderId], references: [id], onDelete: Cascade)
+  
+  @@map("training_records")
+}
+
+enum TrainingStatus {
+  ASSIGNED
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+}
+
+// Communication & Support
+model Ticket {
+  id          String       @id @default(cuid())
+  riderId     String?
+  category    TicketCategory
+  subject     String
+  description String
+  priority    TicketPriority @default(MEDIUM)
+  status      TicketStatus @default(OPEN)
+  assignedTo  String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  closedAt    DateTime?
+
+  // Relationships
+  rider Rider? @relation(fields: [riderId], references: [id], onDelete: SetNull)
+  
+  @@map("tickets")
+}
+
+enum TicketCategory {
+  TECHNICAL_ISSUE
+  VEHICLE_PROBLEM
+  PAYMENT_INQUIRY
+  GENERAL_SUPPORT
+  COMPLAINT
+  FEATURE_REQUEST
+}
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+  REOPENED
+}
