@@ -60,27 +60,86 @@ flcd-platform/
 - Android Studio (for mobile development)
 - Java 11+
 
-### Quick Start
+### 🚀 One-Line Setup (For Claude Users)
+If you're using Claude, run this command to set up the entire project:
 ```bash
-# Clone repository
+curl -sSL https://raw.githubusercontent.com/anasabdullatheef/flcd-platform/master/scripts/claude-setup.sh | bash
+```
+
+### Manual Setup
+
+#### 1. Clone Repository
+```bash
 git clone https://github.com/anasabdullatheef/flcd-platform.git
 cd flcd-platform
-
-# Backend setup
-cd flcd-backend
-npm install
-npx prisma generate
-npm run dev
-
-# Frontend setup  
-cd ../flcd-frontend
-npm install
-npm run dev
-
-# Mobile setup (Android Studio)
-cd ../flcd-mobile
-# Open in Android Studio
 ```
+
+#### 2. Database Setup (Required First)
+```bash
+# macOS
+brew install postgresql@15
+brew services start postgresql@15
+createuser --interactive --pwprompt flcd_admin
+createdb -O flcd_admin flcd_platform
+
+# Ubuntu/Linux  
+sudo apt install postgresql postgresql-contrib
+sudo -u postgres createuser --interactive --pwprompt flcd_admin
+sudo -u postgres createdb -O flcd_admin flcd_platform
+```
+
+#### 3. Backend Setup
+```bash
+cd flcd-backend
+
+# Install dependencies
+npm install
+
+# Setup environment
+cp .env.example .env
+# Edit .env with your database credentials
+
+# Run database migrations and seed
+npm run prisma:migrate
+npm run seed
+
+# Start development server
+npm run dev
+```
+
+#### 4. Frontend Setup  
+```bash
+cd flcd-frontend
+
+# Initialize Next.js project (if not done)
+npx create-next-app@latest . --typescript --tailwind --app
+
+# Install dependencies
+npm install zustand axios @hookform/resolvers zod react-hook-form
+
+# Start development server
+npm run dev
+```
+
+#### 5. Mobile Setup (Android Studio)
+```bash
+cd flcd-mobile
+# Open in Android Studio and sync project
+```
+
+### 🧪 Verify Setup
+```bash
+# Test backend API
+curl http://localhost:3000/health
+
+# Expected response:
+# {"status":"OK","timestamp":"...","service":"FLCD Backend API"}
+```
+
+### 📋 Default Login
+- **Email**: admin@flcd.com
+- **Password**: admin123
+- **Role**: Super Admin
 
 ## Development Workflow
 
