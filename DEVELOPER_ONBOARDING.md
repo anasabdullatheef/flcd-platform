@@ -17,11 +17,13 @@
 - **Sprint 3**: Integration + Testing
 
 ### **Developer 2** (Mobile + Integration Specialist) 
-- **Email**: amina@hashinclu.de
+- **Email**: amina@hashinclu.de ⚠️ **PENDING REPOSITORY ACCESS**
 - **Primary**: Android, Kotlin, Jetpack Compose, Location Services
-- **Sprint 1**: Frontend dashboard setup
+- **Sprint 1**: Frontend dashboard setup (BLOCKED - awaiting access)
 - **Sprint 2**: Mobile app core development
 - **Sprint 3**: Location services + Mobile integration
+
+**❌ BLOCKER**: Repository collaborator access not yet granted
 
 ---
 
@@ -33,8 +35,8 @@
 git clone https://github.com/anasabdullatheef/flcd-platform.git
 cd flcd-platform
 
-# Add collaborator access (pending invitation)
-# Email: amina@hashinclu.de will receive GitHub invitation
+# ❌ BLOCKER: amina@hashinclu.de does NOT have repository access yet
+# Manual action required: Add collaborator via GitHub web interface
 ```
 
 ### **2. Backend Setup (Both Developers)**
