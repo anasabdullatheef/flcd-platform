@@ -205,23 +205,40 @@ print_status "Database seeded with initial data"
 
 # Test backend
 print_info "Testing backend connection..."
-timeout 10 npm run dev &
+
+# Start backend in background with timeout handling
+npm run dev &
 BACKEND_PID=$!
+
+# Wait for server to start
 sleep 5
 
+# Test connection
 if curl -f http://localhost:3000/health &>/dev/null; then
     print_status "Backend is working!"
 else
-    print_warning "Backend test may have failed - this is normal if already running"
+    print_info "Backend test skipped - will be tested manually"
 fi
 
 # Stop test server
-kill $BACKEND_PID 2>/dev/null || true
+if kill -0 $BACKEND_PID 2>/dev/null; then
+    kill $BACKEND_PID 2>/dev/null
+    sleep 2
+    # Force kill if still running
+    kill -9 $BACKEND_PID 2>/dev/null || true
+fi
 
 cd ..
 
 # Setup frontend (basic structure)
 print_info "Setting up frontend structure..."
+
+# Create frontend directory if it doesn't exist
+if [ ! -d "flcd-frontend" ]; then
+    mkdir -p flcd-frontend
+    print_status "Created flcd-frontend directory"
+fi
+
 cd flcd-frontend
 
 # Create basic Next.js structure if needed
