@@ -1,0 +1,17 @@
+{
+  "name": "FLCD Platform Development",
+  "description": "Fleet Logistics and Compliance Dashboard - Full Stack Development",
+  "context": {
+    "tech_stack": {
+      "backend": "Node.js + Express + TypeScript + PostgreSQL + Prisma",
+      "frontend": "Next.js 14 + TypeScript + Tailwind CSS",
+      "mobile": "Kotlin + Jetpack Compose + Room + Retrofit"
+    },
+    "integrations": [
+      "Google Maps API",
+      "SMS Gateway (Twilio)",
+      "Firebase (Push notifications)",
+      "AWS S3 (File storage)"
+    ]
+  }
+}
