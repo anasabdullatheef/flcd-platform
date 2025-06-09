@@ -1,5 +1,11 @@
 # FLCD Platform - Software Requirements Specification
 
+**Document Version**: 1.1  
+**Last Updated**: June 09, 2025  
+**Change Log**:
+- v1.0 - Initial requirements specification
+- v1.1 - Added email verification for admin panel users (June 09, 2025)
+
 ## Table of Contents
 1. [Introduction](#introduction)
 2. [System Overview](#system-overview)
@@ -93,31 +99,45 @@ The FLCD platform manages the complete lifecycle of delivery operations includin
 **Description**: System shall provide comprehensive identity and access management with multi-factor authentication
 **Acceptance Criteria**:
 - Username/password authentication with complexity requirements
+- Email verification for all admin panel users during account creation
 - Multi-factor authentication (MFA) using SMS OTP for sensitive operations
 - Role-based access control (RBAC) with granular permissions
 - Session management with secure token refresh flows
 - Account lockout policies and brute force protection
 - Audit logging for all authentication events
 
-#### FR-AUTH-002: OTP-based Registration and Password Recovery
+#### FR-AUTH-002: Email Verification for Admin Users *(Added: June 09, 2025)*
+**Description**: System shall require email verification for all admin panel user accounts
+**Acceptance Criteria**:
+- Email verification required during admin user creation process
+- Time-limited verification tokens (24-48 hours expiry)
+- Account remains inactive until email verification is completed
+- Resend verification email functionality
+- Clear notification of verification status in admin dashboard
+- Automatic cleanup of unverified accounts after token expiry
+
+#### FR-AUTH-003: OTP-based Registration and Password Recovery
 **Description**: System shall provide secure OTP-based user verification and password reset
 **Acceptance Criteria**:
 - SMS OTP delivery for new rider registration verification
 - Time-limited OTP codes (5-10 minutes expiry)
 - Phone number verification during rider onboarding
 - SMS-based password reset for riders
-- Email-based password reset for admin users
+- Email-based password reset for admin users (after email verification)
 - Rate limiting for OTP requests to prevent abuse
 
 ### 4.2 User Management
 
-#### FR-USER-001: Admin User Creation
-**Description**: Super Admin can create and manage administrative users
+#### FR-USER-001: Admin User Creation with Email Verification *(Updated: June 09, 2025)*
+**Description**: Super Admin can create and manage administrative users with mandatory email verification
 **Acceptance Criteria**:
-- Form-based user creation with all required fields
-- Role assignment with module-specific permissions
+- Form-based user creation with all required fields including valid email address
+- Email verification sent immediately upon user creation
+- Role assignment with module-specific permissions (activated after email verification)
 - Profile image upload capability
-- User status management (active/inactive)
+- User status management (pending verification/active/inactive)
+- Email verification status tracking in user management interface
+- Automatic account activation upon successful email verification
 
 #### FR-USER-002: Bulk User Operations
 **Description**: System shall support bulk user operations
