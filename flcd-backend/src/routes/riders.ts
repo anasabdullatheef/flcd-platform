@@ -173,6 +173,78 @@ const generateRandomPassword = (length: number = 8): string => {
   return password;
 };
 
+/**
+ * @swagger
+ * /riders:
+ *   get:
+ *     summary: Get all riders
+ *     description: Retrieve riders with pagination, search, and filtering options
+ *     tags: [Riders]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Page number for pagination
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Number of riders per page
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: Search term for name, email, or phone
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *           enum: [PENDING, IN_PROGRESS, COMPLETED, REJECTED]
+ *         description: Filter by onboarding status
+ *       - in: query
+ *         name: employmentStatus
+ *         schema:
+ *           type: string
+ *           enum: [PENDING, ACTIVE, SUSPENDED, TERMINATED]
+ *         description: Filter by employment status
+ *       - in: query
+ *         name: partnerName
+ *         schema:
+ *           type: string
+ *         description: Filter by partner name
+ *     responses:
+ *       200:
+ *         description: Riders retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 riders:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Rider'
+ *                 pagination:
+ *                   type: object
+ *                   properties:
+ *                     total:
+ *                       type: integer
+ *                     pages:
+ *                       type: integer
+ *                     current:
+ *                       type: integer
+ *                     limit:
+ *                       type: integer
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
 // GET /api/riders - Get all riders with pagination and filtering
 router.get('/', async (req, res) => {
   try {
@@ -259,6 +331,38 @@ router.get('/', async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /riders:
+ *   post:
+ *     summary: Create new rider
+ *     description: Create a new rider with personal and employment information
+ *     tags: [Riders]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/CreateRiderRequest'
+ *     responses:
+ *       201:
+ *         description: Rider created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 rider:
+ *                   $ref: '#/components/schemas/Rider'
+ *       400:
+ *         description: Validation error or rider already exists
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
 // POST /api/riders - Create new rider
 router.post('/', async (req, res) => {
   try {
@@ -652,6 +756,27 @@ router.post('/bulk-upload', upload.single('csvFile'), async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /riders/template:
+ *   get:
+ *     summary: Download CSV template
+ *     description: Download a CSV template file for bulk rider upload
+ *     tags: [Riders]
+ *     responses:
+ *       200:
+ *         description: CSV template file
+ *         content:
+ *           text/csv:
+ *             schema:
+ *               type: string
+ *               format: binary
+ *         headers:
+ *           Content-Disposition:
+ *             description: Attachment filename
+ *             schema:
+ *               type: string
+ */
 // GET /api/riders/template - Download CSV template
 router.get('/template', (req, res) => {
   const template = [

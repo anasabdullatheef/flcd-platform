@@ -5,6 +5,105 @@ import { s3Upload, uploadToS3, deleteFromS3, generateSignedUrl } from '../config
 const router = express.Router();
 const prisma = new PrismaClient();
 
+/**
+ * @swagger
+ * /documents/riders/{riderId}/documents:
+ *   post:
+ *     summary: Upload documents for rider
+ *     description: Upload multiple documents for a specific rider with support for various document types
+ *     tags: [Documents]
+ *     parameters:
+ *       - in: path
+ *         name: riderId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: Rider ID to upload documents for
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               passport:
+ *                 type: string
+ *                 format: binary
+ *                 description: Passport document (1 file max)
+ *               emiratesId:
+ *                 type: string
+ *                 format: binary
+ *                 description: Emirates ID document (1 file max)
+ *               license:
+ *                 type: string
+ *                 format: binary
+ *                 description: Driving license document (1 file max)
+ *               workPermit:
+ *                 type: string
+ *                 format: binary
+ *                 description: Work permit document (1 file max)
+ *               insurance:
+ *                 type: string
+ *                 format: binary
+ *                 description: Insurance document (1 file max)
+ *               profilePicture:
+ *                 type: string
+ *                 format: binary
+ *                 description: Profile picture (1 file max)
+ *               otherDocuments:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *                 description: Other documents (10 files max)
+ *     responses:
+ *       200:
+ *         description: Documents uploaded successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 documents:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                         format: uuid
+ *                       type:
+ *                         type: string
+ *                         enum: [PASSPORT, EMIRATES_ID, DRIVING_LICENSE, WORK_PERMIT, INSURANCE, PROFILE_PHOTO, OTHER_DOCUMENT]
+ *                       fileName:
+ *                         type: string
+ *                       fileUrl:
+ *                         type: string
+ *                       uploadedAt:
+ *                         type: string
+ *                         format: date-time
+ *       400:
+ *         description: No files uploaded or validation error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       404:
+ *         description: Rider not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
 // Upload multiple documents for a rider
 router.post('/riders/:riderId/documents', (req, res, next) => {
   console.log('=== DOCUMENT UPLOAD MIDDLEWARE STARTED ===');
@@ -118,6 +217,71 @@ router.post('/riders/:riderId/documents', (req, res, next) => {
   }
 });
 
+/**
+ * @swagger
+ * /documents/riders/{riderId}/documents:
+ *   get:
+ *     summary: Get rider documents
+ *     description: Retrieve all documents for a specific rider with download URLs
+ *     tags: [Documents]
+ *     parameters:
+ *       - in: path
+ *         name: riderId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: Rider ID to get documents for
+ *     responses:
+ *       200:
+ *         description: Documents retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 documents:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                         format: uuid
+ *                       riderId:
+ *                         type: string
+ *                         format: uuid
+ *                       type:
+ *                         type: string
+ *                         enum: [PASSPORT, EMIRATES_ID, DRIVING_LICENSE, WORK_PERMIT, INSURANCE, PROFILE_PHOTO, OTHER_DOCUMENT]
+ *                       fileName:
+ *                         type: string
+ *                       filePath:
+ *                         type: string
+ *                       fileSize:
+ *                         type: integer
+ *                       mimeType:
+ *                         type: string
+ *                       status:
+ *                         type: string
+ *                         enum: [PENDING, VERIFIED, REJECTED]
+ *                       fileUrl:
+ *                         type: string
+ *                         description: Signed URL for downloading the document
+ *                       uploadedAt:
+ *                         type: string
+ *                         format: date-time
+ *                       verifiedAt:
+ *                         type: string
+ *                         format: date-time
+ *                         nullable: true
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
 // Get all documents for a rider
 router.get('/riders/:riderId/documents', async (req, res) => {
   try {
@@ -143,6 +307,44 @@ router.get('/riders/:riderId/documents', async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /documents/documents/{documentId}:
+ *   delete:
+ *     summary: Delete document
+ *     description: Delete a specific document by ID and remove it from cloud storage
+ *     tags: [Documents]
+ *     parameters:
+ *       - in: path
+ *         name: documentId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: Document ID to delete
+ *     responses:
+ *       200:
+ *         description: Document deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       404:
+ *         description: Document not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
 // Delete a document
 router.delete('/documents/:documentId', async (req, res) => {
   try {
@@ -171,6 +373,74 @@ router.delete('/documents/:documentId', async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /documents/documents/{documentId}/status:
+ *   put:
+ *     summary: Update document status
+ *     description: Update the verification status of a document (for admin review)
+ *     tags: [Documents]
+ *     parameters:
+ *       - in: path
+ *         name: documentId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: Document ID to update status for
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - status
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 enum: [PENDING, VERIFIED, REJECTED]
+ *                 description: New status for the document
+ *               verifiedAt:
+ *                 type: string
+ *                 format: date-time
+ *                 description: Verification timestamp (auto-set for VERIFIED status)
+ *     responses:
+ *       200:
+ *         description: Document status updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 document:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       format: uuid
+ *                     status:
+ *                       type: string
+ *                       enum: [PENDING, VERIFIED, REJECTED]
+ *                     verifiedAt:
+ *                       type: string
+ *                       format: date-time
+ *                       nullable: true
+ *       404:
+ *         description: Document not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
 // Update document status (for verification)
 router.put('/documents/:documentId/status', async (req, res) => {
   try {
