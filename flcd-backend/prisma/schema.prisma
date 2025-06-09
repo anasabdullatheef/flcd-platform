@@ -347,12 +347,13 @@ model Deduction {
   status      DeductionStatus @default(PENDING)
   dueDate     DateTime?
   paidDate    DateTime?
+  trafficFineId String?     @unique // Foreign key for traffic fine
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
 
   // Relationships
   rider Rider @relation(fields: [riderId], references: [id], onDelete: Cascade)
-  trafficFine TrafficFine? @relation("FineDeduction")
+  trafficFine TrafficFine? @relation("FineDeduction", fields: [trafficFineId], references: [id])
   
   @@map("deductions")
 }
