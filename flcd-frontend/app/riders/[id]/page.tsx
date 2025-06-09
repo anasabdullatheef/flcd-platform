@@ -952,10 +952,269 @@ function EditRiderModal({ rider, onClose, onSuccess }: any) {
             </div>
           </div>
 
-          {/* Status Information */}
+          {/* Identity & Compliance */}
           <div>
-            <h3 className="text-lg font-medium mb-4">Status Information</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <h3 className="text-lg font-medium mb-4">Identity & Compliance</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Passport Number
+                </label>
+                <input
+                  type="text"
+                  value={formData.passportNumber}
+                  onChange={(e) => setFormData(prev => ({ ...prev, passportNumber: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Passport Expiry
+                </label>
+                <input
+                  type="date"
+                  value={formData.passportExpiry}
+                  onChange={(e) => setFormData(prev => ({ ...prev, passportExpiry: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Emirates ID
+                </label>
+                <input
+                  type="text"
+                  value={formData.emiratesId}
+                  onChange={(e) => setFormData(prev => ({ ...prev, emiratesId: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Emirates ID Expiry
+                </label>
+                <input
+                  type="date"
+                  value={formData.emiratesIdExpiry}
+                  onChange={(e) => setFormData(prev => ({ ...prev, emiratesIdExpiry: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  License Number
+                </label>
+                <input
+                  type="text"
+                  value={formData.licenseNumber}
+                  onChange={(e) => setFormData(prev => ({ ...prev, licenseNumber: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  License Expiry
+                </label>
+                <input
+                  type="date"
+                  value={formData.licenseExpiry}
+                  onChange={(e) => setFormData(prev => ({ ...prev, licenseExpiry: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Contact Numbers */}
+          <div>
+            <h3 className="text-lg font-medium mb-4">Contact Numbers</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Company SIM Number
+                </label>
+                <input
+                  type="tel"
+                  value={formData.companySim}
+                  onChange={(e) => setFormData(prev => ({ ...prev, companySim: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Emergency Phone
+                </label>
+                <input
+                  type="tel"
+                  value={formData.emergencyPhone}
+                  onChange={(e) => setFormData(prev => ({ ...prev, emergencyPhone: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Other Information */}
+          <div>
+            <h3 className="text-lg font-medium mb-4">Other Information</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Language Spoken
+                </label>
+                <input
+                  type="text"
+                  value={formData.languageSpoken}
+                  onChange={(e) => setFormData(prev => ({ ...prev, languageSpoken: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  City of Work
+                </label>
+                <input
+                  type="text"
+                  value={formData.cityOfWork}
+                  onChange={(e) => setFormData(prev => ({ ...prev, cityOfWork: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Joining Date
+                </label>
+                <input
+                  type="date"
+                  value={formData.joiningDate}
+                  onChange={(e) => setFormData(prev => ({ ...prev, joiningDate: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Profile Picture
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setDocuments(prev => ({ ...prev, profilePicture: file }));
+                      setFormData(prev => ({ ...prev, profilePicture: file.name }));
+                    }
+                  }}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Blood Group
+                </label>
+                <select
+                  value={formData.bloodGroup}
+                  onChange={(e) => setFormData(prev => ({ ...prev, bloodGroup: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                >
+                  <option value="">Select Blood Group</option>
+                  <option value="A+">A+</option>
+                  <option value="A-">A-</option>
+                  <option value="B+">B+</option>
+                  <option value="B-">B-</option>
+                  <option value="AB+">AB+</option>
+                  <option value="AB-">AB-</option>
+                  <option value="O+">O+</option>
+                  <option value="O-">O-</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Insurance Partner
+                </label>
+                <input
+                  type="text"
+                  value={formData.insurancePartner}
+                  onChange={(e) => setFormData(prev => ({ ...prev, insurancePartner: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Insurance Expiry
+                </label>
+                <input
+                  type="date"
+                  value={formData.insuranceExpiry}
+                  onChange={(e) => setFormData(prev => ({ ...prev, insuranceExpiry: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Health Notes
+                </label>
+                <textarea
+                  value={formData.healthNotes}
+                  onChange={(e) => setFormData(prev => ({ ...prev, healthNotes: e.target.value }))}
+                  rows={2}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Admin Notes
+                </label>
+                <textarea
+                  value={formData.adminNotes}
+                  onChange={(e) => setFormData(prev => ({ ...prev, adminNotes: e.target.value }))}
+                  rows={2}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Partner & Employment */}
+          <div>
+            <h3 className="text-lg font-medium mb-4">Partner & Employment</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Employee ID
+                </label>
+                <input
+                  type="text"
+                  value={formData.employeeId}
+                  onChange={(e) => setFormData(prev => ({ ...prev, employeeId: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Delivery Partner
+                </label>
+                <select
+                  value={formData.deliveryPartner}
+                  onChange={(e) => setFormData(prev => ({ ...prev, deliveryPartner: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                >
+                  <option value="">Select Partner</option>
+                  <option value="Talabat">Talabat</option>
+                  <option value="Careem">Careem</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Delivery Partner ID
+                </label>
+                <input
+                  type="text"
+                  value={formData.deliveryPartnerId}
+                  onChange={(e) => setFormData(prev => ({ ...prev, deliveryPartnerId: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                />
+              </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Employment Status
@@ -971,6 +1230,24 @@ function EditRiderModal({ rider, onClose, onSuccess }: any) {
                   <option value="TERMINATED">Terminated</option>
                 </select>
               </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Address
+                </label>
+                <textarea
+                  value={formData.address}
+                  onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Status Information */}
+          <div>
+            <h3 className="text-lg font-medium mb-4">Status Information</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Onboarding Status
@@ -1082,6 +1359,70 @@ function EditRiderModal({ rider, onClose, onSuccess }: any) {
                       const file = e.target.files?.[0];
                       if (file) {
                         setDocuments(prev => ({ ...prev, emiratesId: file }));
+                      }
+                    }}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    License
+                  </label>
+                  <input
+                    type="file"
+                    accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setDocuments(prev => ({ ...prev, license: file }));
+                      }
+                    }}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Work Permit
+                  </label>
+                  <input
+                    type="file"
+                    accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setDocuments(prev => ({ ...prev, workPermit: file }));
+                      }
+                    }}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Insurance
+                  </label>
+                  <input
+                    type="file"
+                    accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setDocuments(prev => ({ ...prev, insurance: file }));
+                      }
+                    }}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Other Documents
+                  </label>
+                  <input
+                    type="file"
+                    accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setDocuments(prev => ({ ...prev, otherDocuments: file }));
                       }
                     }}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
