@@ -1,10 +1,13 @@
 # FLCD Platform - Software Requirements Specification
 
-**Document Version**: 1.1  
+**Document Version**: 1.4  
 **Last Updated**: June 09, 2025  
 **Change Log**:
 - v1.0 - Initial requirements specification
 - v1.1 - Added email verification for admin panel users (June 09, 2025)
+- v1.2 - Enhanced rider creation with mandatory RiderID & Name requirements (June 09, 2025)
+- v1.3 - Added mobile admin access and push notification system requirements (June 09, 2025)
+- v1.4 - Enhanced traffic fines management with dual date tracking system (June 09, 2025)
 
 ## Table of Contents
 1. [Introduction](#introduction)
@@ -90,6 +93,22 @@ The FLCD platform manages the complete lifecycle of delivery operations includin
   - Report vehicle issues and emergencies
   - Complete compliance acknowledgments
   - Access training materials
+  - Receive push notifications for tasks and updates
+
+### 3.3 Mobile Admin Access
+
+#### Mobile Admin Users
+- **Access Level**: Mobile app with admin privileges
+- **Capabilities**:
+  - **Limited Admin Functions**: Essential administrative tasks on mobile
+  - **Push Notifications**: Receive job/task assignments with immediate alerts
+  - **Quick Actions**: Approve urgent requests, view critical reports
+  - **Deep Linking**: Direct access to admin panel from mobile notifications
+  - **Emergency Response**: Handle urgent situations while mobile
+- **Security**: 
+  - Same authentication as web admin panel
+  - Role-based access control maintained
+  - Optional mobile access enablement per admin user
 
 ## 4. Functional Requirements
 
@@ -149,21 +168,32 @@ The FLCD platform manages the complete lifecycle of delivery operations includin
 ### 4.3 Rider Management
 
 #### FR-RIDER-001: Rider Profile Creation
-**Description**: HR can create comprehensive rider profiles
+**Description**: HR can create comprehensive rider profiles with mandatory field validation
 **Acceptance Criteria**:
+- **Mandatory Fields** (all rider creation methods):
+  - RiderID (riderCode): Unique identifier, uppercase letters/numbers/underscores/hyphens only
+  - First Name: Required for identification, letters and spaces only, max 50 characters
+  - Last Name: Required for identification, letters and spaces only, max 50 characters
+  - Phone Number: Required for communication, unique, valid international format
 - Complete personal information capture
-- Identity document management
+- Identity document management with unique constraints
 - Emergency contact information
 - Employment and partner details
 - Document upload with validation
+- **Bulk Upload Support**: CSV-based bulk rider creation with mandatory field validation
+- Real-time validation and clear error messaging
+- Database constraints to prevent duplicate RiderIDs, phone numbers, and emails
 
 #### FR-RIDER-002: Rider Onboarding Flow
-**Description**: Newly created riders must complete onboarding
+**Description**: Newly created riders must complete onboarding with validated mandatory information
 **Acceptance Criteria**:
-- Email delivery of login credentials
+- **Pre-onboarding Validation**: Verify all mandatory fields (RiderID, firstName, lastName, phone) are complete
+- Email delivery of login credentials using validated contact information
 - Mandatory compliance acknowledgments
-- Profile completion requirements
+- Profile completion requirements with mandatory field enforcement
 - Access restriction until onboarding complete
+- **Mobile App Integration**: Self-registration capabilities with mandatory field validation
+- **Quality Assurance**: Automatic verification of data integrity before onboarding activation
 
 ### 4.4 Compliance Management
 
@@ -196,10 +226,40 @@ The FLCD platform manages the complete lifecycle of delivery operations includin
 #### FR-FIN-002: Deduction Management
 **Description**: Support for multiple deduction types
 **Acceptance Criteria**:
-- Traffic fines with automatic salary deduction
 - Salik charges, loan repayments, penalties
 - Phone usage charges
+- Maintenance and damage cost deductions
 - Bulk upload capability for all deduction types
+- Integration with traffic fines management system
+
+#### FR-FIN-003: Traffic Fines Management
+**Description**: Comprehensive traffic fines tracking with dual date system and lifecycle management
+**Acceptance Criteria**:
+- **Dual Date Tracking System**:
+  - **Issue Date**: Date when traffic fine was issued by the authority
+  - **Upload Date**: Date when fine was uploaded to the FLCD platform
+- **Fine Lifecycle Management**:
+  - Fine registration and documentation
+  - Assignment to responsible rider
+  - Payment status tracking (pending, paid, disputed)
+  - Automatic salary deduction processing
+- **Authority Integration**:
+  - Support for multiple issuing authorities (Dubai Police, Abu Dhabi Police, etc.)
+  - Fine classification by type and severity
+  - Fine amount and payment deadline tracking
+- **Rider Communication**:
+  - Automatic notification upon fine upload
+  - Payment deadline reminders
+  - Dispute resolution workflow
+- **Bulk Operations**:
+  - Bulk fine upload via CSV/Excel with both date fields
+  - Batch processing for multiple riders
+  - Mass notification capabilities
+- **Reporting and Analytics**:
+  - Fine frequency analysis by rider
+  - Cost impact on fleet operations
+  - Authority-wise fine distribution
+  - Payment timeline analysis
 
 ### 4.6 Vehicle Management
 
@@ -298,6 +358,60 @@ The FLCD platform manages the complete lifecycle of delivery operations includin
 - Third-party assessment platform integration
 - Completion tracking and enforcement
 - Access restriction until completion
+
+### 4.11 Mobile Admin Access
+
+#### FR-MOBILE-001: Admin Mobile Login
+**Description**: Administrative users can access the system through mobile app with role-based permissions
+**Acceptance Criteria**:
+- **Cross-Platform Authentication**: Same login credentials as web admin panel
+- **Role-Based Mobile Access**: Admin users can be granted mobile access privileges
+- **Security Compliance**: Mobile sessions follow same security protocols as web
+- **Device Registration**: Track and manage admin mobile devices
+- **Session Management**: Secure logout and session timeout handling
+- **Limited Functionality**: Essential admin functions optimized for mobile interface
+
+#### FR-MOBILE-002: Mobile Admin Dashboard
+**Description**: Streamlined administrative interface for mobile devices
+**Acceptance Criteria**:
+- **Quick Actions**: Access to most critical administrative functions
+- **Emergency Response**: Handle urgent situations while mobile
+- **Status Overview**: Real-time system status and alerts
+- **Deep Linking**: Direct navigation to specific admin functions
+- **Offline Capability**: Basic functionality during network outages
+- **Responsive Design**: Optimized for various mobile screen sizes
+
+### 4.12 Push Notification System
+
+#### FR-NOTIF-001: Job and Task Assignment Notifications
+**Description**: Real-time push notifications for job and task assignments to admin users and riders
+**Acceptance Criteria**:
+- **Immediate Delivery**: Push notifications sent within 30 seconds of assignment
+- **Multi-Platform Support**: iOS and Android push notification delivery
+- **Rich Notifications**: Include job details, priority, and due date information
+- **Action Buttons**: Quick accept/decline/view actions from notification
+- **Deep Linking**: Tap notification opens relevant admin panel section
+- **Delivery Confirmation**: Track notification delivery and read status
+
+#### FR-NOTIF-002: Notification Management System
+**Description**: Comprehensive notification management and configuration
+**Acceptance Criteria**:
+- **Notification Types**: Support for various notification categories (task assignment, emergency, system alerts)
+- **Priority Levels**: Low, medium, high, and urgent priority classifications
+- **User Preferences**: Individual notification settings and preferences
+- **Delivery Scheduling**: Support for scheduled and recurring notifications
+- **Template Management**: Customizable notification templates
+- **Analytics and Reporting**: Notification delivery metrics and engagement tracking
+
+#### FR-NOTIF-003: Admin Panel Access via Mobile
+**Description**: Push notifications enable quick access to admin panel functions
+**Acceptance Criteria**:
+- **Smart Redirects**: Notifications automatically redirect to relevant admin panel sections
+- **Mobile-Optimized Views**: Admin panel functions adapted for mobile viewing
+- **Quick Response Actions**: Essential actions available directly from mobile interface
+- **Context Preservation**: Maintain context when switching between mobile and web interfaces
+- **Emergency Escalation**: Urgent notifications trigger immediate admin panel access
+- **Audit Trail**: Track admin actions taken via mobile notifications
 
 ## 5. Non-Functional Requirements
 

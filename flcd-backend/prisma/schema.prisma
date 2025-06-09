@@ -26,6 +26,7 @@ model User {
   userRoles UserRole[]
   createdRiders Rider[] @relation("CreatedBy")
   adminAcknowledgements Acknowledgement[] @relation("AdminAcknowledgements")
+  uploadedFines TrafficFine[] @relation("FineUploader")
   
   @@map("users")
 }
@@ -150,6 +151,7 @@ model Rider {
   healthChecks         HealthCheck[]
   trainingRecords      TrainingRecord[]
   tickets              Ticket[]
+  trafficFines         TrafficFine[]
   
   @@map("riders")
 }
@@ -263,6 +265,7 @@ model Vehicle {
   documents          VehicleDocument[]
   maintenanceRecords MaintenanceRecord[]
   damageReports      DamageReport[]
+  trafficFines       TrafficFine[]
   
   @@map("vehicles")
 }
@@ -349,18 +352,20 @@ model Deduction {
 
   // Relationships
   rider Rider @relation(fields: [riderId], references: [id], onDelete: Cascade)
+  trafficFine TrafficFine? @relation("FineDeduction")
   
   @@map("deductions")
 }
 
 enum DeductionType {
-  TRAFFIC_FINE
+  TRAFFIC_FINE_DEDUCTION // Links to TrafficFine model
   SALIK_CHARGE
   PHONE_CHARGE
   LOAN_REPAYMENT
   PENALTY
   MAINTENANCE_COST
   DAMAGE_COST
+  GENERAL_DEDUCTION
 }
 
 enum DeductionStatus {
@@ -368,6 +373,63 @@ enum DeductionStatus {
   DEDUCTED
   PAID
   WAIVED
+}
+
+// Traffic Fines Management
+model TrafficFine {
+  id              String           @id @default(cuid())
+  riderId         String
+  vehicleId       String?
+  fineNumber      String           @unique
+  issueDate       DateTime         // Date fine was issued by authority
+  uploadDate      DateTime         @default(now()) // Date fine was uploaded to FLCD platform
+  issuingAuthority String          // Dubai Police, Abu Dhabi Police, etc.
+  violationType   ViolationType
+  description     String
+  amount          Decimal          @db.Decimal(10, 2)
+  paymentDeadline DateTime?
+  location        String?
+  vehiclePlate    String?
+  status          FineStatus       @default(PENDING)
+  paymentDate     DateTime?
+  disputeReason   String?
+  disputeDate     DateTime?
+  notes           String?
+  uploadedBy      String
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  // Relationships
+  rider       Rider   @relation(fields: [riderId], references: [id], onDelete: Cascade)
+  vehicle     Vehicle? @relation(fields: [vehicleId], references: [id])
+  uploader    User    @relation("FineUploader", fields: [uploadedBy], references: [id])
+  deduction   Deduction? @relation("FineDeduction")
+
+  @@map("traffic_fines")
+}
+
+enum ViolationType {
+  SPEEDING
+  PARKING_VIOLATION
+  TRAFFIC_LIGHT_VIOLATION
+  MOBILE_PHONE_USE
+  SEAT_BELT_VIOLATION
+  LANE_VIOLATION
+  RECKLESS_DRIVING
+  DOCUMENTATION_VIOLATION
+  VEHICLE_CONDITION
+  OTHER
+}
+
+enum FineStatus {
+  PENDING
+  NOTIFIED
+  ACKNOWLEDGED
+  PAID
+  DISPUTED
+  DEDUCTED
+  CANCELLED
+  OVERDUE
 }
 
 // Maintenance & Damage
