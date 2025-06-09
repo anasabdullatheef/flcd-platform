@@ -155,7 +155,7 @@ export default function RidersPage() {
       if (selectedEmploymentStatus !== 'all') params.append('employmentStatus', selectedEmploymentStatus)
       if (selectedPartner !== 'all') params.append('partnerName', selectedPartner)
 
-      const response = await fetch(`http://localhost:5000/api/riders?${params}`, {
+      const response = await fetch(`http://localhost:3000/api/riders?${params}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -218,7 +218,7 @@ export default function RidersPage() {
 
     try {
       const token = localStorage.getItem('accessToken')
-      const response = await fetch(`http://localhost:5000/api/riders/${riderId}`, {
+      const response = await fetch(`http://localhost:3000/api/riders/${riderId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -240,7 +240,7 @@ export default function RidersPage() {
 
   const downloadCSVTemplate = () => {
     const link = document.createElement('a')
-    link.href = 'http://localhost:5000/api/riders/template'
+    link.href = 'http://localhost:3000/api/riders/template'
     link.download = 'rider_template.csv'
     document.body.appendChild(link)
     link.click()
@@ -430,7 +430,7 @@ export default function RidersPage() {
                 {!canManageRiders() && (
                   <div className="text-sm text-gray-500 bg-gray-50 px-3 py-2 rounded-md">
                     <Users className="h-4 w-4 inline mr-2" />
-                    View-only access - Contact admin to manage riders
+                    View-only access - Contact IAM admin to manage riders
                   </div>
                 )}
               </div>
@@ -756,7 +756,7 @@ function CreateRiderModal({ onClose, onSuccess }: any) {
       // First, create the rider
       alert('Creating rider...')
       console.log('Creating rider...')
-      const riderResponse = await fetch('http://localhost:5000/api/riders', {
+      const riderResponse = await fetch('http://localhost:3000/api/riders', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -794,7 +794,7 @@ function CreateRiderModal({ onClose, onSuccess }: any) {
         alert('Starting document upload...')
         console.log('Uploading documents to rider:', riderId)
 
-        const documentResponse = await fetch(`http://localhost:5000/api/documents/riders/${riderId}/documents`, {
+        const documentResponse = await fetch(`http://localhost:3000/api/documents/riders/${riderId}/documents`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`
@@ -1063,7 +1063,7 @@ function BulkUploadModal({ onClose, onSuccess }: any) {
       const formData = new FormData()
       formData.append('csvFile', file)
 
-      const response = await fetch('http://localhost:5000/api/riders/bulk-upload', {
+      const response = await fetch('http://localhost:3000/api/riders/bulk-upload', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -1253,7 +1253,7 @@ function EditRiderModal({ rider, onClose, onSuccess }: any) {
     const fetchDocuments = async () => {
       try {
         const token = localStorage.getItem('accessToken')
-        const response = await fetch(`http://localhost:5000/api/documents/riders/${rider.id}/documents`, {
+        const response = await fetch(`http://localhost:3000/api/documents/riders/${rider.id}/documents`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -1278,7 +1278,7 @@ function EditRiderModal({ rider, onClose, onSuccess }: any) {
 
     try {
       const token = localStorage.getItem('accessToken')
-      const response = await fetch(`http://localhost:5000/api/documents/documents/${documentId}`, {
+      const response = await fetch(`http://localhost:3000/api/documents/documents/${documentId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -1303,7 +1303,7 @@ function EditRiderModal({ rider, onClose, onSuccess }: any) {
     
     try {
       const token = localStorage.getItem('accessToken')
-      const response = await fetch(`http://localhost:5000/api/riders/${rider.id}`, {
+      const response = await fetch(`http://localhost:3000/api/riders/${rider.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

@@ -442,7 +442,7 @@ export default function AdminSettingsPage() {
                   <Menu className="h-5 w-5" />
                 </Button>
                 <div className="flex items-center space-x-2 text-sm text-gray-500">
-                  <span>Admin</span>
+                  <span>IAM</span>
                   <span>/</span>
                   <span>Settings</span>
                 </div>
@@ -458,7 +458,7 @@ export default function AdminSettingsPage() {
                   <div>
                     <h1 className="text-3xl font-bold text-gray-900 flex items-center space-x-3">
                       <Settings className="h-8 w-8" />
-                      <span>Admin Settings</span>
+                      <span>Settings</span>
                     </h1>
                     <p className="text-gray-600 mt-2">Manage system configurations and settings</p>
                   </div>
