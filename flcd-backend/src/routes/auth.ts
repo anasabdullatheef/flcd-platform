@@ -1,6 +1,6 @@
 import express from 'express';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import jwt, { SignOptions } from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
 
@@ -53,16 +53,19 @@ function generateOTP(): string {
 }
 
 function generateTokens(userId: string) {
+  const secret = process.env.JWT_SECRET || 'default-secret';
+  const refreshSecret = process.env.JWT_REFRESH_SECRET || 'default-refresh-secret';
+  
   const accessToken = jwt.sign(
     { userId },
-    process.env.JWT_SECRET || 'default-secret',
-    { expiresIn: process.env.JWT_EXPIRES_IN || '1h' }
+    secret,
+    { expiresIn: '1h' }
   );
 
   const refreshToken = jwt.sign(
     { userId },
-    process.env.JWT_REFRESH_SECRET || 'default-refresh-secret',
-    { expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d' }
+    refreshSecret,
+    { expiresIn: '7d' }
   );
 
   return { accessToken, refreshToken };
