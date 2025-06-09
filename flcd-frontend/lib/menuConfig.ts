@@ -55,7 +55,7 @@ export const getMenuItems = (activePage: string): MenuItem[] => [
   { 
     icon: UserCog, 
     label: 'Users', 
-    href: '/admin?tab=users',
+    href: '/admin/iam?tab=users',
     active: activePage === 'users'
   },
   { 
@@ -84,9 +84,9 @@ export const getMenuItems = (activePage: string): MenuItem[] => [
   },
   { 
     icon: Shield, 
-    label: 'Admin', 
-    href: '/admin',
-    active: activePage === 'admin'
+    label: 'IAM', 
+    href: '/admin/iam',
+    active: activePage === 'iam'
   },
   { 
     icon: Settings, 
