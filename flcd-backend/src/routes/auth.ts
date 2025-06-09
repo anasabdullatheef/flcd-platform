@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import jwt, { SignOptions } from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
+import { emailService } from '../services/emailService';
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -152,11 +153,17 @@ router.post('/register/send-otp', async (req, res) => {
       userData: { phone, firstName, lastName }
     };
 
-    console.log(`OTP for ${phone}: ${otp}`);
+    // Send OTP via email
+    const emailSent = await emailService.sendOTP(phone, firstName, lastName, otp);
+    
+    if (!emailSent) {
+      console.warn(`Failed to send OTP email for ${phone}, but continuing with console log`);
+    }
 
     res.json({
       message: 'OTP sent successfully',
-      expiresIn: 600 // 10 minutes in seconds
+      expiresIn: 600, // 10 minutes in seconds
+      emailSent: emailSent
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -282,11 +289,17 @@ router.post('/forgot-password/send-otp', async (req, res) => {
       expiresAt
     };
 
-    console.log(`Password reset OTP for ${email}: ${otp}`);
+    // Send password reset OTP via email
+    const emailSent = await emailService.sendPasswordResetOTP(email, otp);
+    
+    if (!emailSent) {
+      console.warn(`Failed to send password reset email for ${email}, but continuing with console log`);
+    }
 
     res.json({
       message: 'Password reset OTP sent successfully',
-      expiresIn: 600
+      expiresIn: 600,
+      emailSent: emailSent
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
