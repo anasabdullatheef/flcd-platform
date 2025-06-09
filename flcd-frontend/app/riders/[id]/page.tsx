@@ -19,7 +19,8 @@ import {
   Truck,
   Settings,
   Eye,
-  Download
+  Download,
+  Plus
 } from 'lucide-react'
 
 interface Rider {
@@ -97,6 +98,7 @@ export default function RiderProfilePage() {
   const [loadingDocuments, setLoadingDocuments] = useState(true)
   const [loadingAcknowledgements, setLoadingAcknowledgements] = useState(false)
   const [activeTab, setActiveTab] = useState('overview')
+  const [showEditModal, setShowEditModal] = useState(false)
 
   useEffect(() => {
     fetchRider()
@@ -106,7 +108,7 @@ export default function RiderProfilePage() {
   const fetchRider = async () => {
     try {
       const token = localStorage.getItem('accessToken')
-      const response = await fetch(`http://localhost:4000/api/riders/${riderId}`, {
+      const response = await fetch(`http://localhost:3000/api/riders/${riderId}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -132,7 +134,7 @@ export default function RiderProfilePage() {
   const fetchDocuments = async () => {
     try {
       const token = localStorage.getItem('accessToken')
-      const response = await fetch(`http://localhost:4000/api/documents/riders/${riderId}/documents`, {
+      const response = await fetch(`http://localhost:3000/api/documents/riders/${riderId}/documents`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -153,7 +155,7 @@ export default function RiderProfilePage() {
     try {
       setLoadingAcknowledgements(true)
       const token = localStorage.getItem('accessToken')
-      const response = await fetch(`http://localhost:4000/api/riders/${riderId}/acknowledgements/${ackId}/status`, {
+      const response = await fetch(`http://localhost:3000/api/riders/${riderId}/acknowledgements/${ackId}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -182,8 +184,8 @@ export default function RiderProfilePage() {
     try {
       const token = localStorage.getItem('accessToken')
       
-      // Try direct download first (for backend port 4000)
-      const downloadUrl = `http://localhost:4000/api/riders/${riderId}/acknowledgements/${ackId}/download`
+      // Try direct download first (for backend port 3000)
+      const downloadUrl = `http://localhost:3000/api/riders/${riderId}/acknowledgements/${ackId}/download`
       
       // Create a temporary link and trigger download
       const link = document.createElement('a')
@@ -205,7 +207,7 @@ export default function RiderProfilePage() {
 
     try {
       const token = localStorage.getItem('accessToken')
-      const response = await fetch(`http://localhost:4000/api/riders/${riderId}`, {
+      const response = await fetch(`http://localhost:3000/api/riders/${riderId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -294,7 +296,7 @@ export default function RiderProfilePage() {
               </Button>
               <Button
                 variant="outline"
-                onClick={() => router.push(`/riders/${riderId}/edit`)}
+                onClick={() => setShowEditModal(true)}
                 className="flex items-center space-x-2"
               >
                 <Edit className="h-4 w-4" />
@@ -692,6 +694,412 @@ export default function RiderProfilePage() {
             </CardContent>
           </Card>
         )}
+      </div>
+
+      {/* Edit Rider Modal */}
+      {showEditModal && rider && (
+        <EditRiderModal 
+          rider={rider}
+          onClose={() => setShowEditModal(false)}
+          onSuccess={() => {
+            fetchRider()
+            fetchDocuments()
+            setShowEditModal(false)
+          }}
+        />
+      )}
+    </div>
+  )
+}
+
+// EditRiderModal Component (imported from riders page)
+function EditRiderModal({ rider, onClose, onSuccess }: any) {
+  const [documents, setDocuments] = useState<{[key: string]: File | null}>({
+    passport: null,
+    emiratesId: null,
+    license: null,
+    workPermit: null,
+    insurance: null,
+    profilePicture: null,
+    otherDocuments: null
+  });
+  
+  const [existingDocuments, setExistingDocuments] = useState<any[]>([]);
+  const [loadingDocuments, setLoadingDocuments] = useState(true);
+
+  const [formData, setFormData] = useState({
+    firstName: rider.firstName || '',
+    lastName: rider.lastName || '',
+    email: rider.email || '',
+    phone: rider.phone || '',
+    dateOfBirth: rider.dateOfBirth ? new Date(rider.dateOfBirth).toISOString().split('T')[0] : '',
+    nationality: rider.nationality || '',
+    emiratesId: rider.emiratesId || '',
+    passportNumber: rider.passportNumber || '',
+    licenseNumber: rider.licenseNumber || '',
+    licenseExpiry: rider.licenseExpiry ? new Date(rider.licenseExpiry).toISOString().split('T')[0] : '',
+    emergencyPhone: rider.emergencyPhone || '',
+    address: rider.address || '',
+    employmentStatus: rider.employmentStatus || 'PENDING',
+    onboardingStatus: rider.onboardingStatus || 'PENDING',
+    isActive: rider.isActive !== false,
+    // Additional fields that might be missing
+    passportExpiry: rider.passportExpiry ? new Date(rider.passportExpiry).toISOString().split('T')[0] : '',
+    emiratesIdExpiry: rider.emiratesIdExpiry ? new Date(rider.emiratesIdExpiry).toISOString().split('T')[0] : '',
+    companySim: rider.companySim || '',
+    languageSpoken: rider.languageSpoken || '',
+    cityOfWork: rider.cityOfWork || '',
+    joiningDate: rider.joiningDate ? new Date(rider.joiningDate).toISOString().split('T')[0] : '',
+    bloodGroup: rider.bloodGroup || '',
+    insurancePartner: rider.insurancePartner || '',
+    insuranceExpiry: rider.insuranceExpiry ? new Date(rider.insuranceExpiry).toISOString().split('T')[0] : '',
+    healthNotes: rider.healthNotes || '',
+    adminNotes: rider.adminNotes || '',
+    employeeId: rider.employeeId || '',
+    deliveryPartner: rider.deliveryPartner || '',
+    deliveryPartnerId: rider.deliveryPartnerId || ''
+  })
+
+  // Fetch existing documents when modal opens
+  useEffect(() => {
+    const fetchDocuments = async () => {
+      try {
+        const token = localStorage.getItem('accessToken')
+        const response = await fetch(`http://localhost:3000/api/documents/riders/${rider.id}/documents`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        })
+        
+        if (response.ok) {
+          const data = await response.json()
+          setExistingDocuments(data.documents || [])
+        }
+      } catch (error) {
+        console.error('Error fetching documents:', error)
+      } finally {
+        setLoadingDocuments(false)
+      }
+    }
+
+    fetchDocuments()
+  }, [rider.id])
+
+  const deleteDocument = async (documentId: string) => {
+    if (!confirm('Are you sure you want to delete this document?')) return
+
+    try {
+      const token = localStorage.getItem('accessToken')
+      const response = await fetch(`http://localhost:3000/api/documents/documents/${documentId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+
+      if (response.ok) {
+        setExistingDocuments(prev => prev.filter(doc => doc.id !== documentId))
+        alert('Document deleted successfully!')
+      } else {
+        const error = await response.json()
+        alert(error.error || 'Error deleting document')
+      }
+    } catch (error) {
+      console.error('Error deleting document:', error)
+      alert('Error deleting document')
+    }
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    try {
+      const token = localStorage.getItem('accessToken')
+      const response = await fetch(`http://localhost:3000/api/riders/${rider.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(formData)
+      })
+
+      if (response.ok) {
+        // Upload any new documents
+        const documentsToUpload = Object.entries(documents).filter(([key, file]) => file !== null)
+        
+        if (documentsToUpload.length > 0) {
+          const documentFormData = new FormData()
+          
+          documentsToUpload.forEach(([fieldName, file]) => {
+            if (file) {
+              documentFormData.append(fieldName, file)
+            }
+          })
+
+          const documentResponse = await fetch(`http://localhost:3000/api/documents/riders/${rider.id}/documents`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`
+            },
+            body: documentFormData
+          })
+
+          if (!documentResponse.ok) {
+            const documentError = await documentResponse.json()
+            alert(`Document upload failed: ${documentError.error || 'Unknown error'}`)
+          } else {
+            alert('Documents uploaded successfully!')
+          }
+        }
+
+        onSuccess()
+        alert('Rider updated successfully!')
+      } else {
+        const error = await response.json()
+        alert(error.error || 'Error updating rider')
+      }
+    } catch (error) {
+      console.error('Error updating rider:', error)
+      alert('Error updating rider')
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold">Edit Rider: {rider.firstName} {rider.lastName}</h2>
+          <Button variant="ghost" onClick={onClose}>
+            <Plus className="h-5 w-5 rotate-45" />
+          </Button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Personal Information */}
+          <div>
+            <h3 className="text-lg font-medium mb-4">Personal Information</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  First Name *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.firstName}
+                  onChange={(e) => setFormData(prev => ({ ...prev, firstName: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Last Name *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.lastName}
+                  onChange={(e) => setFormData(prev => ({ ...prev, lastName: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Phone *
+                </label>
+                <input
+                  type="tel"
+                  required
+                  value={formData.phone}
+                  onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Nationality
+                </label>
+                <input
+                  type="text"
+                  value={formData.nationality}
+                  onChange={(e) => setFormData(prev => ({ ...prev, nationality: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Date of Birth
+                </label>
+                <input
+                  type="date"
+                  value={formData.dateOfBirth}
+                  onChange={(e) => setFormData(prev => ({ ...prev, dateOfBirth: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Status Information */}
+          <div>
+            <h3 className="text-lg font-medium mb-4">Status Information</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Employment Status
+                </label>
+                <select
+                  value={formData.employmentStatus}
+                  onChange={(e) => setFormData(prev => ({ ...prev, employmentStatus: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                >
+                  <option value="PENDING">Pending</option>
+                  <option value="ACTIVE">Active</option>
+                  <option value="SUSPENDED">Suspended</option>
+                  <option value="TERMINATED">Terminated</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Onboarding Status
+                </label>
+                <select
+                  value={formData.onboardingStatus}
+                  onChange={(e) => setFormData(prev => ({ ...prev, onboardingStatus: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                >
+                  <option value="PENDING">Pending</option>
+                  <option value="IN_PROGRESS">In Progress</option>
+                  <option value="COMPLETED">Completed</option>
+                  <option value="REJECTED">Rejected</option>
+                </select>
+              </div>
+              <div className="flex items-center space-x-2 mt-6">
+                <input
+                  type="checkbox"
+                  id="isActive"
+                  checked={formData.isActive}
+                  onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.checked }))}
+                  className="rounded border-gray-300"
+                />
+                <label htmlFor="isActive" className="text-sm font-medium text-gray-700">
+                  Rider is active
+                </label>
+              </div>
+            </div>
+          </div>
+
+          {/* Document Management */}
+          <div>
+            <h3 className="text-lg font-medium mb-4">Document Management</h3>
+            
+            {/* Existing Documents */}
+            <div className="mb-6">
+              <h4 className="text-md font-medium mb-3">Current Documents</h4>
+              {loadingDocuments ? (
+                <p className="text-gray-500">Loading documents...</p>
+              ) : existingDocuments.length > 0 ? (
+                <div className="space-y-2">
+                  {existingDocuments.map((doc) => (
+                    <div key={doc.id} className="flex items-center justify-between p-3 border border-gray-200 rounded-md">
+                      <div className="flex items-center space-x-3">
+                        <FileText className="h-5 w-5 text-gray-500" />
+                        <div>
+                          <p className="text-sm font-medium">{doc.fileName}</p>
+                          <p className="text-xs text-gray-500">
+                            {doc.type.replace('_', ' ')} • {new Date(doc.uploadedAt).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => window.open(doc.fileUrl, '_blank')}
+                          className="text-blue-600 hover:text-blue-800"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => deleteDocument(doc.id)}
+                          className="text-red-600 hover:text-red-800"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-500">No documents uploaded yet.</p>
+              )}
+            </div>
+
+            {/* Upload New Documents */}
+            <div>
+              <h4 className="text-md font-medium mb-3">Upload New Documents</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Passport
+                  </label>
+                  <input
+                    type="file"
+                    accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setDocuments(prev => ({ ...prev, passport: file }));
+                      }
+                    }}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Emirates ID
+                  </label>
+                  <input
+                    type="file"
+                    accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setDocuments(prev => ({ ...prev, emiratesId: file }));
+                      }
+                    }}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-end space-x-4">
+            <Button type="button" variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button type="submit" className="bg-black hover:bg-gray-800">
+              Update Rider
+            </Button>
+          </div>
+        </form>
       </div>
     </div>
   )
