@@ -39,6 +39,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **Dual Date Tracking System**: 
   - **Issue Date**: Official date when traffic fine was issued by authority
   - **Upload Date**: Date when fine was uploaded to FLCD platform (auto-generated)
+- **Historical Vehicle Ownership Assignment**: 
+  - **Ownership-Based Assignment**: Assign fines to rider who owned vehicle at time of issue
+  - **Vehicle History Tracking**: Complete audit trail of vehicle ownership changes
+  - **Ownership Validation**: Prevent incorrect fine assignment due to vehicle transfers
 - **Comprehensive Fine Lifecycle**: Complete workflow from fine upload to resolution
 - **Authority Integration**: Support for multiple issuing authorities (Dubai Police, Abu Dhabi Police, etc.)
 - **Fine Classification**: Categorize by violation type and severity level
@@ -47,10 +51,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 #### 🔧 Technical Implementation
 - **Enhanced Database Schema**: New TrafficFine model with comprehensive fields
+- **Vehicle Assignment History**: Enhanced VehicleAssignment model for ownership tracking
 - **API Endpoints**: Complete CRUD operations for traffic fine management
-- **Bulk Upload System**: CSV upload with dual date validation
+- **Ownership Lookup Service**: Historical vehicle ownership validation service
+- **Bulk Upload System**: CSV upload with dual date and ownership validation
 - **Integration Layer**: Connect fines to automatic deduction system
-- **Notification System**: Push notifications for new fines and deadlines
+- **Notification System**: Push notifications for new fines to correct historical owners
 
 #### 💰 Financial Integration
 - **Automatic Deduction Creation**: Convert fines to salary deductions

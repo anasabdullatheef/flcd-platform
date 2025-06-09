@@ -226,12 +226,14 @@ POST   /api/traffic-fines/:id/deduction      // Convert to deduction
 
 **Traffic Fines Implementation Features:**
 - **Dual Date System**: Issue date (by authority) and upload date (to platform)
+- **Historical Vehicle Ownership**: Assign fines to rider who owned vehicle at time of issue
+- **Vehicle Assignment History**: Complete audit trail of vehicle ownership changes
 - **Authority Integration**: Support for multiple issuing authorities
-- **Fine Lifecycle**: From upload to payment/deduction
-- **Bulk Operations**: CSV upload with both date fields required
+- **Fine Lifecycle**: From upload to payment/deduction with ownership validation
+- **Bulk Operations**: CSV upload with both date fields and ownership lookup
 - **Dispute Management**: Rider dispute workflow with admin review
 - **Auto-Deduction**: Automatic salary deduction creation
-- **Notification Integration**: Push notifications for new fines
+- **Notification Integration**: Push notifications for new fines to correct owner
 
 ### 2.3 File Upload & Document Management
 ```javascript

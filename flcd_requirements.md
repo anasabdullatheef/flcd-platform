@@ -233,14 +233,19 @@ The FLCD platform manages the complete lifecycle of delivery operations includin
 - Integration with traffic fines management system
 
 #### FR-FIN-003: Traffic Fines Management
-**Description**: Comprehensive traffic fines tracking with dual date system and lifecycle management
+**Description**: Comprehensive traffic fines tracking with dual date system and historical vehicle ownership
 **Acceptance Criteria**:
 - **Dual Date Tracking System**:
   - **Issue Date**: Date when traffic fine was issued by the authority
   - **Upload Date**: Date when fine was uploaded to the FLCD platform
+- **Historical Vehicle Ownership Assignment**:
+  - **Ownership-Based Assignment**: Fines assigned to rider who owned the vehicle at the time of issue (not upload)
+  - **Vehicle Assignment History**: Complete historical tracking of vehicle ownership changes
+  - **Ownership Lookup**: System determines vehicle owner based on fine issue date
+  - **Assignment Validation**: Prevent incorrect fine assignment due to vehicle transfers
 - **Fine Lifecycle Management**:
   - Fine registration and documentation
-  - Assignment to responsible rider
+  - Assignment to responsible rider based on historical ownership
   - Payment status tracking (pending, paid, disputed)
   - Automatic salary deduction processing
 - **Authority Integration**:
@@ -248,18 +253,23 @@ The FLCD platform manages the complete lifecycle of delivery operations includin
   - Fine classification by type and severity
   - Fine amount and payment deadline tracking
 - **Rider Communication**:
-  - Automatic notification upon fine upload
+  - Automatic notification upon fine upload to correct historical owner
   - Payment deadline reminders
   - Dispute resolution workflow
 - **Bulk Operations**:
   - Bulk fine upload via CSV/Excel with both date fields
-  - Batch processing for multiple riders
+  - Batch processing for multiple riders with ownership validation
   - Mass notification capabilities
+- **Vehicle History Logs**:
+  - Complete audit trail of vehicle ownership changes
+  - Assignment/unassignment timestamps for accurate fine allocation
+  - Transfer history for dispute resolution
 - **Reporting and Analytics**:
   - Fine frequency analysis by rider
   - Cost impact on fleet operations
   - Authority-wise fine distribution
   - Payment timeline analysis
+  - Vehicle ownership impact analysis
 
 ### 4.6 Vehicle Management
 
