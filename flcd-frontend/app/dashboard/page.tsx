@@ -6,23 +6,19 @@ import { apiClient } from '@/lib/api'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { 
-  LayoutDashboard, 
-  Users, 
-  Truck, 
-  Settings, 
-  ClipboardList, 
-  MessageSquare, 
-  UserCheck,
   LogOut,
   Bell,
   ChevronLeft,
   ChevronRight,
   Plus,
   MapPin,
-  Eye,
   Menu,
-  X
+  X,
+  Truck,
+  Settings,
+  Eye
 } from 'lucide-react'
+import { getMenuItems } from '@/lib/menuConfig'
 
 interface JobTicket {
   id: string
@@ -39,18 +35,7 @@ export default function Dashboard() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [notificationsOpen, setNotificationsOpen] = useState(true)
 
-  const menuItems = [
-    { icon: LayoutDashboard, label: 'Dashboards', active: true },
-    { icon: Users, label: 'Riders', href: '/riders' },
-    { icon: Truck, label: 'Vehicles' },
-    { icon: Settings, label: 'Garage' },
-    { icon: UserCheck, label: 'Accounts', hasSubmenu: true },
-    { icon: ClipboardList, label: 'Job Tickets' },
-    { icon: MessageSquare, label: 'Request & Complaints' },
-    { icon: Eye, label: 'Acknowledgements' },
-    { icon: MessageSquare, label: 'Chat' },
-    { icon: Settings, label: 'Settings', href: '/admin/settings' },
-  ]
+  const menuItems = getMenuItems('dashboard')
 
   const jobTickets: JobTicket[] = [
     {

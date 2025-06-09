@@ -9,7 +9,6 @@ import {
   Trash2,
   Users,
   Shield,
-  Settings,
   Eye,
   Check,
   X,
@@ -25,13 +24,12 @@ import {
   Phone,
   Calendar,
   Activity,
-  LayoutDashboard,
-  Truck,
-  ClipboardList,
   MessageSquare,
   UserCheck,
-  LogOut
+  LogOut,
+  Settings
 } from 'lucide-react'
+import { getMenuItems } from '@/lib/menuConfig'
 
 interface Role {
   id: string
@@ -87,7 +85,10 @@ interface SystemModules {
 type AdminTab = 'overview' | 'roles' | 'users' | 'access'
 
 export default function AdminPage() {
-  const [activeTab, setActiveTab] = useState<AdminTab>('overview')
+  // Check URL params for tab
+  const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null
+  const initialTab = urlParams?.get('tab') as AdminTab || 'overview'
+  const [activeTab, setActiveTab] = useState<AdminTab>(initialTab)
   const [roles, setRoles] = useState<Role[]>([])
   const [users, setUsers] = useState<User[]>([])
   const [modules, setModules] = useState<SystemModules>({})
@@ -180,22 +181,11 @@ export default function AdminPage() {
     window.location.href = '/'
   }
 
-  const menuItems = [
-    { icon: LayoutDashboard, label: 'Dashboards', href: '/dashboard' },
-    { icon: Users, label: 'Riders' },
-    { icon: Truck, label: 'Vehicles' },
-    { icon: Settings, label: 'Garage' },
-    { icon: UserCheck, label: 'Accounts', hasSubmenu: true },
-    { icon: ClipboardList, label: 'Job Tickets' },
-    { icon: MessageSquare, label: 'Request & Complaints' },
-    { icon: Eye, label: 'Acknowledgements' },
-    { icon: MessageSquare, label: 'Chat' },
-    { icon: Shield, label: 'Admin', active: true, href: '/admin' },
-  ]
+  const menuItems = getMenuItems('admin')
 
   const fetchRoles = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/roles')
+      const response = await fetch('http://localhost:5000/api/roles')
       const data = await response.json()
       if (response.ok) {
         setRoles(data.roles)
@@ -207,7 +197,7 @@ export default function AdminPage() {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/users')
+      const response = await fetch('http://localhost:5000/api/users')
       const data = await response.json()
       if (response.ok) {
         setUsers(data.users || [])
@@ -219,7 +209,7 @@ export default function AdminPage() {
 
   const fetchModules = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/roles/modules')
+      const response = await fetch('http://localhost:5000/api/roles/modules')
       const data = await response.json()
       if (response.ok) {
         setModules(data.modules)
@@ -234,7 +224,7 @@ export default function AdminPage() {
 
   const initializePresetRoles = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/roles/initialize-presets', {
+      const response = await fetch('http://localhost:5000/api/roles/initialize-presets', {
         method: 'POST'
       })
       if (response.ok) {
@@ -251,7 +241,7 @@ export default function AdminPage() {
     if (!confirm('Are you sure you want to delete this role?')) return
 
     try {
-      const response = await fetch(`http://localhost:3000/api/roles/${roleId}`, {
+      const response = await fetch(`http://localhost:5000/api/roles/${roleId}`, {
         method: 'DELETE'
       })
       
@@ -272,7 +262,7 @@ export default function AdminPage() {
     if (!confirm('Are you sure you want to delete this user?')) return
 
     try {
-      const response = await fetch(`http://localhost:3000/api/users/${userId}`, {
+      const response = await fetch(`http://localhost:5000/api/users/${userId}`, {
         method: 'DELETE'
       })
       
@@ -1114,7 +1104,7 @@ function CreateUserModal({ roles, onClose, onSuccess }: any) {
     e.preventDefault()
     
     try {
-      const response = await fetch('http://localhost:3000/api/users', {
+      const response = await fetch('http://localhost:5000/api/users', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -1267,7 +1257,7 @@ function CreateRoleModal({ modules, onClose, onSuccess }: any) {
     e.preventDefault()
     
     try {
-      const response = await fetch('http://localhost:3000/api/roles', {
+      const response = await fetch('http://localhost:5000/api/roles', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -1414,7 +1404,7 @@ function EditRoleModal({ role, modules, onClose, onSuccess }: any) {
     e.preventDefault()
     
     try {
-      const response = await fetch(`http://localhost:3000/api/roles/${role.id}`, {
+      const response = await fetch(`http://localhost:5000/api/roles/${role.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -1578,7 +1568,7 @@ function EditUserModal({ user, roles, onClose, onSuccess }: any) {
     e.preventDefault()
     
     try {
-      const response = await fetch(`http://localhost:3000/api/users/${user.id}`, {
+      const response = await fetch(`http://localhost:5000/api/users/${user.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
