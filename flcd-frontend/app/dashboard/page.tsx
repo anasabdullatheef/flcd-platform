@@ -1,6 +1,8 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import ProtectedRoute from '@/components/auth/ProtectedRoute'
+import { apiClient } from '@/lib/api'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { 
@@ -17,7 +19,9 @@ import {
   ChevronRight,
   Plus,
   MapPin,
-  Eye
+  Eye,
+  Menu,
+  X
 } from 'lucide-react'
 
 interface JobTicket {
@@ -32,6 +36,7 @@ export default function Dashboard() {
   const [user, setUser] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [notificationsOpen, setNotificationsOpen] = useState(true)
 
   const menuItems = [
@@ -58,39 +63,26 @@ export default function Dashboard() {
   ]
 
   useEffect(() => {
-    const token = localStorage.getItem('accessToken')
-    if (!token) {
-      window.location.href = '/'
-      return
+    const fetchProfile = async () => {
+      try {
+        const response = await apiClient.getProfile()
+        if (response.data?.user) {
+          setUser(response.data.user)
+        } else if (response.error) {
+          console.error('Profile fetch error:', response.error)
+        }
+      } catch (error) {
+        console.error('Profile fetch error:', error)
+      } finally {
+        setIsLoading(false)
+      }
     }
 
-    fetch('http://localhost:3000/api/users/profile', {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    })
-    .then(res => res.json())
-    .then(data => {
-      if (data.user) {
-        setUser(data.user)
-      } else {
-        localStorage.removeItem('accessToken')
-        localStorage.removeItem('refreshToken')
-        window.location.href = '/'
-      }
-    })
-    .catch(() => {
-      localStorage.removeItem('accessToken')
-      localStorage.removeItem('refreshToken')
-      window.location.href = '/'
-    })
-    .finally(() => setIsLoading(false))
+    fetchProfile()
   }, [])
 
   const handleLogout = () => {
-    localStorage.removeItem('accessToken')
-    localStorage.removeItem('refreshToken')
-    window.location.href = '/'
+    apiClient.logout()
   }
 
   if (isLoading) {
@@ -105,9 +97,10 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-white flex">
+    <ProtectedRoute>
+      <div className="min-h-screen bg-white flex">
       {/* Sidebar */}
-      <div className={`bg-white border-r border-gray-200 transition-all duration-300 flex flex-col ${sidebarCollapsed ? 'w-16' : 'w-64'}`}>
+      <div className={`bg-white border-r border-gray-200 transition-all duration-300 flex flex-col ${sidebarCollapsed ? 'w-16' : 'w-64'} ${sidebarCollapsed ? 'md:w-16' : 'md:w-64'} hidden md:flex`}>
         <div className="p-4 flex-1">
           <div className="flex items-center justify-between mb-8">
             {!sidebarCollapsed && (
@@ -197,15 +190,98 @@ export default function Dashboard() {
         </div>
       </div>
 
+      {/* Mobile Menu Overlay */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 z-50 md:hidden">
+          <div className="fixed inset-0 bg-black bg-opacity-50" onClick={() => setMobileMenuOpen(false)} />
+          <div className="fixed left-0 top-0 bottom-0 w-64 bg-white shadow-lg">
+            <div className="p-4 flex-1">
+              <div className="flex items-center justify-between mb-8">
+                <h1 className="text-2xl font-bold text-black">FLCD</h1>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="p-2 hover:bg-gray-100"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+              
+              <nav className="space-y-1">
+                {menuItems.map((item, index) => (
+                  <Button
+                    key={index}
+                    variant={item.active ? "default" : "ghost"}
+                    className={`w-full justify-start px-3 ${
+                      item.active ? 'bg-black text-white hover:bg-gray-800' : 'text-gray-700 hover:bg-gray-100'
+                    }`}
+                    onClick={() => {
+                      if (item.href) {
+                        window.location.href = item.href
+                      }
+                      setMobileMenuOpen(false)
+                    }}
+                  >
+                    <item.icon className="h-5 w-5 mr-3 flex-shrink-0" />
+                    <span className="flex-1 text-left truncate">{item.label}</span>
+                    {item.hasSubmenu && (
+                      <ChevronRight className="h-4 w-4 ml-auto" />
+                    )}
+                  </Button>
+                ))}
+              </nav>
+            </div>
+
+            {/* Mobile User Profile */}
+            <div className="p-4 border-t border-gray-200">
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center">
+                  <span className="text-white text-sm font-medium">
+                    {user?.firstName?.[0] || 'A'}
+                  </span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900 truncate">
+                    {user?.firstName || 'Admin'} {user?.lastName || 'User'}
+                  </p>
+                  <p className="text-xs text-gray-500 truncate">Super Admin</p>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleLogout}
+                  className="p-1"
+                  title="Logout"
+                >
+                  <LogOut className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
-        <header className="bg-white border-b border-gray-200 px-6 py-4">
+        <header className="bg-white border-b border-gray-200 px-4 md:px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2 text-sm text-gray-500">
-              <span>Home</span>
-              <span>/</span>
-              <span>Dashboard</span>
+            <div className="flex items-center space-x-4">
+              {/* Mobile menu button */}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="md:hidden"
+                onClick={() => setMobileMenuOpen(true)}
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
+              <div className="flex items-center space-x-2 text-sm text-gray-500">
+                <span>Home</span>
+                <span>/</span>
+                <span>Dashboard</span>
+              </div>
             </div>
             <div className="flex items-center space-x-4">
               <Button variant="ghost" size="sm">
@@ -405,5 +481,6 @@ export default function Dashboard() {
         </div>
       </div>
     </div>
+    </ProtectedRoute>
   )
 }

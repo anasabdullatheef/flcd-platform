@@ -55,12 +55,14 @@ function generateOTP(): string {
 function generateTokens(userId: string) {
   const accessToken = jwt.sign(
     { userId },
-    process.env.JWT_SECRET || 'default-secret'
+    process.env.JWT_SECRET || 'default-secret',
+    { expiresIn: process.env.JWT_EXPIRES_IN || '1h' }
   );
 
   const refreshToken = jwt.sign(
     { userId },
-    process.env.JWT_REFRESH_SECRET || 'default-refresh-secret'
+    process.env.JWT_REFRESH_SECRET || 'default-refresh-secret',
+    { expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d' }
   );
 
   return { accessToken, refreshToken };

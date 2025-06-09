@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
+import { apiClient } from '@/lib/api'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Truck, Eye, EyeOff } from 'lucide-react'
 
@@ -16,22 +17,14 @@ export default function LoginPage() {
     setIsLoading(true)
     
     try {
-      const response = await fetch('http://localhost:3000/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      })
+      const response = await apiClient.login(email, password)
       
-      const data = await response.json()
-      
-      if (response.ok) {
-        localStorage.setItem('accessToken', data.accessToken)
-        localStorage.setItem('refreshToken', data.refreshToken)
+      if (response.data) {
+        localStorage.setItem('accessToken', response.data.accessToken)
+        localStorage.setItem('refreshToken', response.data.refreshToken)
         window.location.href = '/dashboard'
       } else {
-        alert(data.error || 'Login failed')
+        alert(response.error || 'Login failed')
       }
     } catch (error) {
       console.error('Login error:', error)
