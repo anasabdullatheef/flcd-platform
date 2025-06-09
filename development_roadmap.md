@@ -1,5 +1,11 @@
 # FLCD Platform Development Roadmap
 
+**Document Version**: 1.1  
+**Last Updated**: June 09, 2025  
+**Change Log**:
+- v1.0 - Initial development roadmap
+- v1.1 - Updated authentication system to include email verification for admin users (June 09, 2025)
+
 ## Phase 1: Project Setup & Architecture (Weeks 1-2)
 
 ### 1.1 Backend Setup (Node.js)
@@ -136,7 +142,7 @@ npx prisma studio  # For database visualization
 
 ### 2.2 API Development Priority
 
-**Week 3-4: Identity & Access Management + OTP System**
+**Week 3-4: Identity & Access Management + Email/OTP Verification** *(Updated: June 09, 2025)*
 ```javascript
 // Essential authentication endpoints
 POST /api/auth/login
@@ -145,15 +151,23 @@ POST /api/auth/register/verify-otp   // Verify OTP and complete registration
 POST /api/auth/refresh-token
 POST /api/auth/forgot-password/send-otp
 POST /api/auth/forgot-password/verify-reset
+
+// Email verification for admin users (Added: June 09, 2025)
+POST /api/auth/admin/send-verification    // Send email verification
+POST /api/auth/admin/verify-email        // Verify email token
+POST /api/auth/admin/resend-verification  // Resend verification email
+
+// User profile management
 GET  /api/users/profile
 PUT  /api/users/profile
 
 // Admin user management with proper IAM
 GET    /api/admin/users
-POST   /api/admin/users
+POST   /api/admin/users                  // Creates user + sends verification email
 PUT    /api/admin/users/:id
 DELETE /api/admin/users/:id
 PUT    /api/admin/users/:id/permissions
+GET    /api/admin/users/:id/verification-status  // Added: June 09, 2025
 ```
 
 **Week 4-5: Rider Management**
@@ -222,6 +236,8 @@ components/
 ├── Auth/
 │   ├── LoginForm.tsx
 │   ├── ForgotPassword.tsx
+│   ├── EmailVerification.tsx    // Email verification component (Added: June 09, 2025)
+│   ├── VerificationStatus.tsx   // Show verification status (Added: June 09, 2025)
 │   └── ProtectedRoute.tsx
 └── Common/
     ├── DataTable.tsx
@@ -259,9 +275,11 @@ components/
 │   ├── RouteOptimizer.tsx     // Route planning and optimization
 │   └── LocationHistory.tsx    // Historical route tracking
 ├── Authentication/
-│   ├── OTPVerification.tsx    // SMS OTP verification component
-│   ├── MFASetup.tsx          // Multi-factor authentication setup
-│   └── PermissionManager.tsx  // Role and permission management
+│   ├── OTPVerification.tsx      // SMS OTP verification component
+│   ├── EmailVerification.tsx    // Email verification for admin users (Added: June 09, 2025)
+│   ├── MFASetup.tsx            // Multi-factor authentication setup
+│   ├── PermissionManager.tsx    // Role and permission management
+│   └── VerificationStatus.tsx   // Email/phone verification status display (Added: June 09, 2025)
 ├── Analytics/
 │   ├── KPIDashboard.tsx      // KPI monitoring
 │   ├── PerformanceCharts.tsx
