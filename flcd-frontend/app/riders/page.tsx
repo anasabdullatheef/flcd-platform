@@ -7,7 +7,6 @@ import {
   Plus,
   Edit,
   Trash2,
-  Users,
   Search,
   Filter,
   ChevronDown,
@@ -16,19 +15,14 @@ import {
   Mail,
   Phone,
   Calendar,
-  LayoutDashboard,
-  Truck,
-  ClipboardList,
-  MessageSquare,
-  UserCheck,
   LogOut,
-  Settings,
-  Shield,
   Upload,
   Download,
-  Eye,
-  FileText
+  FileText,
+  Users,
+  Eye
 } from 'lucide-react'
+import { getMenuItems } from '@/lib/menuConfig'
 
 interface Rider {
   id: string
@@ -116,18 +110,7 @@ export default function RidersPage() {
   const [showEditRiderModal, setShowEditRiderModal] = useState(false)
   const [selectedRiderData, setSelectedRiderData] = useState<Rider | null>(null)
 
-  const menuItems = [
-    { icon: LayoutDashboard, label: 'Dashboards', href: '/dashboard' },
-    { icon: Users, label: 'Riders', active: true, href: '/riders' },
-    { icon: Truck, label: 'Vehicles' },
-    { icon: Settings, label: 'Garage' },
-    { icon: UserCheck, label: 'Accounts', hasSubmenu: true },
-    { icon: ClipboardList, label: 'Job Tickets' },
-    { icon: MessageSquare, label: 'Request & Complaints' },
-    { icon: Eye, label: 'Acknowledgements' },
-    { icon: MessageSquare, label: 'Chat' },
-    { icon: Shield, label: 'Admin', href: '/admin' },
-  ]
+  const menuItems = getMenuItems('riders')
 
   useEffect(() => {
     fetchCurrentUser()
@@ -172,7 +155,7 @@ export default function RidersPage() {
       if (selectedEmploymentStatus !== 'all') params.append('employmentStatus', selectedEmploymentStatus)
       if (selectedPartner !== 'all') params.append('partnerName', selectedPartner)
 
-      const response = await fetch(`http://localhost:3000/api/riders?${params}`, {
+      const response = await fetch(`http://localhost:5000/api/riders?${params}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -235,7 +218,7 @@ export default function RidersPage() {
 
     try {
       const token = localStorage.getItem('accessToken')
-      const response = await fetch(`http://localhost:3000/api/riders/${riderId}`, {
+      const response = await fetch(`http://localhost:5000/api/riders/${riderId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -257,7 +240,7 @@ export default function RidersPage() {
 
   const downloadCSVTemplate = () => {
     const link = document.createElement('a')
-    link.href = 'http://localhost:3000/api/riders/template'
+    link.href = 'http://localhost:5000/api/riders/template'
     link.download = 'rider_template.csv'
     document.body.appendChild(link)
     link.click()
@@ -773,7 +756,7 @@ function CreateRiderModal({ onClose, onSuccess }: any) {
       // First, create the rider
       alert('Creating rider...')
       console.log('Creating rider...')
-      const riderResponse = await fetch('http://localhost:3000/api/riders', {
+      const riderResponse = await fetch('http://localhost:5000/api/riders', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -811,7 +794,7 @@ function CreateRiderModal({ onClose, onSuccess }: any) {
         alert('Starting document upload...')
         console.log('Uploading documents to rider:', riderId)
 
-        const documentResponse = await fetch(`http://localhost:3000/api/documents/riders/${riderId}/documents`, {
+        const documentResponse = await fetch(`http://localhost:5000/api/documents/riders/${riderId}/documents`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`
@@ -1080,7 +1063,7 @@ function BulkUploadModal({ onClose, onSuccess }: any) {
       const formData = new FormData()
       formData.append('csvFile', file)
 
-      const response = await fetch('http://localhost:3000/api/riders/bulk-upload', {
+      const response = await fetch('http://localhost:5000/api/riders/bulk-upload', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -1270,7 +1253,7 @@ function EditRiderModal({ rider, onClose, onSuccess }: any) {
     const fetchDocuments = async () => {
       try {
         const token = localStorage.getItem('accessToken')
-        const response = await fetch(`http://localhost:3000/api/documents/riders/${rider.id}/documents`, {
+        const response = await fetch(`http://localhost:5000/api/documents/riders/${rider.id}/documents`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -1295,7 +1278,7 @@ function EditRiderModal({ rider, onClose, onSuccess }: any) {
 
     try {
       const token = localStorage.getItem('accessToken')
-      const response = await fetch(`http://localhost:3000/api/documents/documents/${documentId}`, {
+      const response = await fetch(`http://localhost:5000/api/documents/documents/${documentId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -1320,7 +1303,7 @@ function EditRiderModal({ rider, onClose, onSuccess }: any) {
     
     try {
       const token = localStorage.getItem('accessToken')
-      const response = await fetch(`http://localhost:3000/api/riders/${rider.id}`, {
+      const response = await fetch(`http://localhost:5000/api/riders/${rider.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

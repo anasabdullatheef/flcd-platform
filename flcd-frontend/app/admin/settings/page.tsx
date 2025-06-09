@@ -16,9 +16,14 @@ import {
   XCircle,
   Star,
   StarOff,
-  ArrowLeft
+  LogOut,
+  ChevronLeft,
+  ChevronRight,
+  Menu,
+  X
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
+import { getMenuItems } from '@/lib/menuConfig'
 
 interface EmailConfiguration {
   id: string
@@ -56,6 +61,7 @@ interface EmailConfigForm {
 }
 
 export default function AdminSettingsPage() {
+  const [user, setUser] = useState<any>(null)
   const [emailConfigurations, setEmailConfigurations] = useState<EmailConfiguration[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -63,6 +69,10 @@ export default function AdminSettingsPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isTesting, setIsTesting] = useState(false)
   const [testingConfigId, setTestingConfigId] = useState<string | null>(null)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  const menuItems = getMenuItems('settings')
 
   const [formData, setFormData] = useState<EmailConfigForm>({
     host: '',
@@ -77,8 +87,20 @@ export default function AdminSettingsPage() {
   })
 
   useEffect(() => {
+    fetchProfile()
     fetchEmailConfigurations()
   }, [])
+
+  const fetchProfile = async () => {
+    try {
+      const response = await apiClient.getProfile()
+      if (response.data?.user) {
+        setUser(response.data.user)
+      }
+    } catch (error) {
+      console.error('Profile fetch error:', error)
+    }
+  }
 
   const fetchEmailConfigurations = async () => {
     try {
@@ -221,6 +243,10 @@ export default function AdminSettingsPage() {
     resetForm()
   }
 
+  const handleLogout = () => {
+    apiClient.logout()
+  }
+
   if (isLoading) {
     return (
       <ProtectedRoute>
@@ -236,31 +262,208 @@ export default function AdminSettingsPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50 p-6">
-        <div className="max-w-6xl mx-auto">
-          {/* Header */}
-          <div className="mb-8">
-            <div className="flex items-center space-x-4 mb-4">
+      <div className="min-h-screen bg-white flex">
+        {/* Sidebar */}
+        <div className={`bg-white border-r border-gray-200 transition-all duration-300 flex flex-col ${sidebarCollapsed ? 'w-16' : 'w-64'} ${sidebarCollapsed ? 'md:w-16' : 'md:w-64'} hidden md:flex`}>
+          <div className="p-4 flex-1">
+            <div className="flex items-center justify-between mb-8">
+              {!sidebarCollapsed && (
+                <h1 className="text-2xl font-bold text-black">FLCD</h1>
+              )}
               <Button
                 variant="ghost"
-                onClick={() => window.history.back()}
-                className="flex items-center space-x-2"
+                size="sm"
+                onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                className="p-2 hover:bg-gray-100"
+                title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
               >
-                <ArrowLeft className="h-4 w-4" />
-                <span>Back</span>
+                {sidebarCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
               </Button>
             </div>
             
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900 flex items-center space-x-3">
-                  <Settings className="h-8 w-8" />
-                  <span>Admin Settings</span>
-                </h1>
-                <p className="text-gray-600 mt-2">Manage system configurations and settings</p>
+            <nav className="space-y-1">
+              {menuItems.map((item, index) => (
+                <div key={index} className="relative group">
+                  <Button
+                    variant={item.active ? "default" : "ghost"}
+                    className={`w-full justify-start transition-all duration-200 ${sidebarCollapsed ? 'px-2' : 'px-3'} ${
+                      item.active ? 'bg-black text-white hover:bg-gray-800' : 'text-gray-700 hover:bg-gray-100'
+                    }`}
+                    title={sidebarCollapsed ? item.label : undefined}
+                    onClick={() => {
+                      if (item.href) {
+                        window.location.href = item.href
+                      }
+                    }}
+                  >
+                    <item.icon className={`h-5 w-5 ${sidebarCollapsed ? '' : 'mr-3'} flex-shrink-0`} />
+                    {!sidebarCollapsed && (
+                      <span className="flex-1 text-left truncate">{item.label}</span>
+                    )}
+                    {!sidebarCollapsed && item.hasSubmenu && (
+                      <ChevronRight className="h-4 w-4 ml-auto" />
+                    )}
+                  </Button>
+                  
+                  {/* Tooltip for collapsed sidebar */}
+                  {sidebarCollapsed && (
+                    <div className="absolute left-full ml-2 top-1/2 transform -translate-y-1/2 bg-black text-white px-2 py-1 rounded text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
+                      {item.label}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </nav>
+          </div>
+
+          {/* User Profile at Bottom */}
+          <div className="p-4 border-t border-gray-200">
+            <div className={`flex items-center ${sidebarCollapsed ? 'justify-center' : 'space-x-3'} group relative`}>
+              <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center">
+                <span className="text-white text-sm font-medium">
+                  {user?.firstName?.[0] || 'A'}
+                </span>
+              </div>
+              {!sidebarCollapsed && (
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900 truncate">
+                    {user?.firstName || 'Admin'} {user?.lastName || 'User'}
+                  </p>
+                  <p className="text-xs text-gray-500 truncate">Super Admin</p>
+                </div>
+              )}
+              {!sidebarCollapsed && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleLogout}
+                  className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-1"
+                  title="Logout"
+                >
+                  <LogOut className="h-4 w-4" />
+                </Button>
+              )}
+              
+              {/* Tooltip for collapsed sidebar */}
+              {sidebarCollapsed && (
+                <div className="absolute left-full ml-2 top-1/2 transform -translate-y-1/2 bg-black text-white px-2 py-1 rounded text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
+                  {user?.firstName || 'Admin'} {user?.lastName || 'User'} - Super Admin
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Menu Overlay */}
+        {mobileMenuOpen && (
+          <div className="fixed inset-0 z-50 md:hidden">
+            <div className="fixed inset-0 bg-black bg-opacity-50" onClick={() => setMobileMenuOpen(false)} />
+            <div className="fixed left-0 top-0 bottom-0 w-64 bg-white shadow-lg">
+              <div className="p-4 flex-1">
+                <div className="flex items-center justify-between mb-8">
+                  <h1 className="text-2xl font-bold text-black">FLCD</h1>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="p-2 hover:bg-gray-100"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+                
+                <nav className="space-y-1">
+                  {menuItems.map((item, index) => (
+                    <Button
+                      key={index}
+                      variant={item.active ? "default" : "ghost"}
+                      className={`w-full justify-start px-3 ${
+                        item.active ? 'bg-black text-white hover:bg-gray-800' : 'text-gray-700 hover:bg-gray-100'
+                      }`}
+                      onClick={() => {
+                        if (item.href) {
+                          window.location.href = item.href
+                        }
+                        setMobileMenuOpen(false)
+                      }}
+                    >
+                      <item.icon className="h-5 w-5 mr-3 flex-shrink-0" />
+                      <span className="flex-1 text-left truncate">{item.label}</span>
+                      {item.hasSubmenu && (
+                        <ChevronRight className="h-4 w-4 ml-auto" />
+                      )}
+                    </Button>
+                  ))}
+                </nav>
+              </div>
+
+              {/* Mobile User Profile */}
+              <div className="p-4 border-t border-gray-200">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center">
+                    <span className="text-white text-sm font-medium">
+                      {user?.firstName?.[0] || 'A'}
+                    </span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-900 truncate">
+                      {user?.firstName || 'Admin'} {user?.lastName || 'User'}
+                    </p>
+                    <p className="text-xs text-gray-500 truncate">Super Admin</p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleLogout}
+                    className="p-1"
+                    title="Logout"
+                  >
+                    <LogOut className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
+        )}
+
+        {/* Main Content */}
+        <div className="flex-1 flex flex-col">
+          {/* Header */}
+          <header className="bg-white border-b border-gray-200 px-4 md:px-6 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                {/* Mobile menu button */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="md:hidden"
+                  onClick={() => setMobileMenuOpen(true)}
+                >
+                  <Menu className="h-5 w-5" />
+                </Button>
+                <div className="flex items-center space-x-2 text-sm text-gray-500">
+                  <span>Admin</span>
+                  <span>/</span>
+                  <span>Settings</span>
+                </div>
+              </div>
+            </div>
+          </header>
+
+          <div className="flex-1 p-6 bg-gray-50">
+            <div className="max-w-6xl mx-auto">
+              {/* Page Header */}
+              <div className="mb-8">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h1 className="text-3xl font-bold text-gray-900 flex items-center space-x-3">
+                      <Settings className="h-8 w-8" />
+                      <span>Admin Settings</span>
+                    </h1>
+                    <p className="text-gray-600 mt-2">Manage system configurations and settings</p>
+                  </div>
+                </div>
+              </div>
 
           {/* Email Configuration Section */}
           <Card className="mb-8">
@@ -587,6 +790,8 @@ export default function AdminSettingsPage() {
               )}
             </CardContent>
           </Card>
+            </div>
+          </div>
         </div>
       </div>
     </ProtectedRoute>
