@@ -49,7 +49,7 @@ export default function Dashboard() {
     { icon: MessageSquare, label: 'Request & Complaints' },
     { icon: Eye, label: 'Acknowledgements' },
     { icon: MessageSquare, label: 'Chat' },
-    { icon: Settings, label: 'Admin', href: '/admin' },
+    { icon: Settings, label: 'Settings', href: '/admin/settings' },
   ]
 
   const jobTickets: JobTicket[] = [

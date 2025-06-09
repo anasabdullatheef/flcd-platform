@@ -12,6 +12,7 @@ import riderRoutes from './routes/riders';
 import roleRoutes from './routes/roles';
 import documentRoutes from './routes/documents';
 import testUploadRoutes from './routes/test-upload';
+import emailConfigRoutes from './routes/emailConfig';
 
 // Load environment variables
 dotenv.config();
@@ -37,6 +38,7 @@ app.use('/api/riders', riderRoutes);
 app.use('/api/roles', roleRoutes);
 app.use('/api/documents', documentRoutes);
 app.use('/api/test', testUploadRoutes);
+app.use('/api/email-config', emailConfigRoutes);
 
 // Serve test upload page and uploads directory
 app.use(express.static('.'));

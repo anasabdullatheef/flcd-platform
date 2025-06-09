@@ -27,6 +27,7 @@ model User {
   createdRiders Rider[] @relation("CreatedBy")
   adminAcknowledgements Acknowledgement[] @relation("AdminAcknowledgements")
   uploadedFines TrafficFine[] @relation("FineUploader")
+  emailConfigurations EmailConfiguration[] @relation("EmailConfigCreator")
   
   @@map("users")
 }
@@ -636,4 +637,29 @@ enum AcknowledgementType {
   EQUIPMENT
   TRAINING
   OTHER
+}
+
+// Email Configuration
+model EmailConfiguration {
+  id          String   @id @default(cuid())
+  host        String
+  port        Int      @default(587)
+  secure      Boolean  @default(false)
+  username    String
+  password    String   // Encrypted in production
+  fromEmail   String
+  fromName    String   @default("FLCD Platform")
+  isActive    Boolean  @default(true)
+  isDefault   Boolean  @default(false)
+  testEmail   String?  // For testing configuration
+  lastTested  DateTime?
+  testResult  String?  // Success/error message from last test
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  creator User @relation("EmailConfigCreator", fields: [createdBy], references: [id])
+
+  @@map("email_configurations")
 }
