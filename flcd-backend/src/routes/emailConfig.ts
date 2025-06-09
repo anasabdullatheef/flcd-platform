@@ -28,6 +28,40 @@ const testEmailSchema = z.object({
 // Apply authentication to all routes
 router.use(authenticateToken as any);
 
+/**
+ * @swagger
+ * /email-config:
+ *   get:
+ *     summary: Get all email configurations
+ *     description: Retrieve all email configurations with creator information
+ *     tags: [Email Configuration]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Email configurations retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 emailConfigurations:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/EmailConfiguration'
+ *       401:
+ *         description: Unauthorized - Invalid or missing token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
 // GET /api/email-config - Get all email configurations
 router.get('/', async (req, res) => {
   try {
@@ -70,6 +104,86 @@ router.get('/', async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /email-config:
+ *   post:
+ *     summary: Create email configuration
+ *     description: Create a new email configuration for sending emails
+ *     tags: [Email Configuration]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - host
+ *               - username
+ *               - password
+ *               - fromEmail
+ *             properties:
+ *               host:
+ *                 type: string
+ *                 example: smtp.gmail.com
+ *               port:
+ *                 type: integer
+ *                 default: 587
+ *                 example: 587
+ *               secure:
+ *                 type: boolean
+ *                 default: false
+ *                 example: false
+ *               username:
+ *                 type: string
+ *                 example: admin@flcd.com
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 example: your-app-password
+ *               fromEmail:
+ *                 type: string
+ *                 format: email
+ *                 example: admin@flcd.com
+ *               fromName:
+ *                 type: string
+ *                 default: FLCD Platform
+ *                 example: FLCD Platform
+ *               testEmail:
+ *                 type: string
+ *                 format: email
+ *                 example: test@example.com
+ *               isDefault:
+ *                 type: boolean
+ *                 default: false
+ *                 example: false
+ *     responses:
+ *       201:
+ *         description: Email configuration created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 emailConfiguration:
+ *                   $ref: '#/components/schemas/EmailConfiguration'
+ *       400:
+ *         description: Validation error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
 // POST /api/email-config - Create new email configuration
 router.post('/', async (req, res) => {
   try {
@@ -121,6 +235,81 @@ router.post('/', async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /email-config/{id}:
+ *   put:
+ *     summary: Update email configuration
+ *     description: Update an existing email configuration
+ *     tags: [Email Configuration]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: Email configuration ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - host
+ *               - username
+ *               - password
+ *               - fromEmail
+ *             properties:
+ *               host:
+ *                 type: string
+ *               port:
+ *                 type: integer
+ *               secure:
+ *                 type: boolean
+ *               username:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *                 format: password
+ *               fromEmail:
+ *                 type: string
+ *                 format: email
+ *               fromName:
+ *                 type: string
+ *               testEmail:
+ *                 type: string
+ *                 format: email
+ *               isDefault:
+ *                 type: boolean
+ *     responses:
+ *       200:
+ *         description: Email configuration updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 emailConfiguration:
+ *                   $ref: '#/components/schemas/EmailConfiguration'
+ *       400:
+ *         description: Validation error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       404:
+ *         description: Email configuration not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
 // PUT /api/email-config/:id - Update email configuration
 router.put('/:id', async (req, res) => {
   try {
@@ -178,6 +367,87 @@ router.put('/:id', async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /email-config/{id}/test:
+ *   post:
+ *     summary: Test email configuration
+ *     description: Send a test email to verify the email configuration works correctly
+ *     tags: [Email Configuration]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: Email configuration ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - testEmail
+ *             properties:
+ *               testEmail:
+ *                 type: string
+ *                 format: email
+ *                 example: test@example.com
+ *                 description: Email address to send test email to
+ *     responses:
+ *       200:
+ *         description: Test email sent successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 testResult:
+ *                   type: object
+ *                   properties:
+ *                     success:
+ *                       type: boolean
+ *                     messageId:
+ *                       type: string
+ *                     testEmail:
+ *                       type: string
+ *                     testedAt:
+ *                       type: string
+ *                       format: date-time
+ *       400:
+ *         description: Email test failed or validation error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                 details:
+ *                   type: string
+ *                 testResult:
+ *                   type: object
+ *                   properties:
+ *                     success:
+ *                       type: boolean
+ *                     error:
+ *                       type: string
+ *                     testedAt:
+ *                       type: string
+ *                       format: date-time
+ *       404:
+ *         description: Email configuration not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
 // POST /api/email-config/:id/test - Test email configuration
 router.post('/:id/test', async (req, res) => {
   try {
@@ -317,6 +587,52 @@ router.post('/:id/set-default', async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /email-config/{id}:
+ *   delete:
+ *     summary: Delete email configuration
+ *     description: Delete an email configuration (cannot delete if it's the only one)
+ *     tags: [Email Configuration]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: Email configuration ID
+ *     responses:
+ *       200:
+ *         description: Email configuration deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       400:
+ *         description: Cannot delete the only email configuration
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       404:
+ *         description: Email configuration not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
 // DELETE /api/email-config/:id - Delete email configuration
 router.delete('/:id', async (req, res) => {
   try {

@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import swaggerUi from 'swagger-ui-express';
 import { PrismaClient } from '@prisma/client';
 import dotenv from 'dotenv';
 
@@ -13,6 +14,7 @@ import roleRoutes from './routes/roles';
 import documentRoutes from './routes/documents';
 import testUploadRoutes from './routes/test-upload';
 import emailConfigRoutes from './routes/emailConfig';
+import { swaggerSpec } from './config/swagger';
 
 // Load environment variables
 dotenv.config();
@@ -30,6 +32,9 @@ app.use(cors());
 app.use(morgan('combined'));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
+
+// Swagger Documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -58,12 +63,15 @@ app.get('/', (req, res) => {
   res.json({
     message: 'FLCD Platform API',
     version: '1.0.0',
+    documentation: '/api-docs',
     endpoints: {
       health: '/health',
       auth: '/api/auth',
       users: '/api/users',
       riders: '/api/riders',
-      roles: '/api/roles'
+      roles: '/api/roles',
+      documents: '/api/documents',
+      emailConfig: '/api/email-config'
     }
   });
 });
@@ -99,7 +107,8 @@ async function startServer() {
     app.listen(port, '0.0.0.0', () => {
       console.log(`🚀 FLCD Backend API running on port ${port}`);
       console.log(`📍 Health check: http://localhost:${port}/health`);
-      console.log(`📍 API docs: http://localhost:${port}/`);
+      console.log(`📍 API Overview: http://localhost:${port}/`);
+      console.log(`📚 Swagger Docs: http://localhost:${port}/api-docs`);
       console.log(`📍 Server binding: 0.0.0.0:${port}`);
     });
   } catch (error) {

@@ -1,0 +1,1294 @@
+{
+  "info": {
+    "name": "FLCD Platform API Collection",
+    "_postman_id": "flcd-platform-2024",
+    "description": "Complete API testing collection for FLCD Platform including Authentication, Users, Riders, Roles, Documents, and Email Configuration",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api",
+      "type": "string"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refreshToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "testUserId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "testRoleId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "testRiderId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "testEmailConfigId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "01. Authentication",
+      "item": [
+        {
+          "name": "Register Super Admin (First Time Setup)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201 or 400\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([201, 400]);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.test(\"Response has user object\", function () {",
+                  "        pm.expect(response).to.have.property('user');",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"admin@flcd.com\",\n    \"password\": \"admin123\",\n    \"phone\": \"+971501234567\",\n    \"firstName\": \"Super\",\n    \"lastName\": \"Admin\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test(\"Response has tokens\", function () {",
+                  "    pm.expect(response).to.have.property('accessToken');",
+                  "    pm.expect(response).to.have.property('refreshToken');",
+                  "});",
+                  "",
+                  "// Save tokens for subsequent requests",
+                  "if (response.accessToken) {",
+                  "    pm.collectionVariables.set(\"accessToken\", response.accessToken);",
+                  "    pm.collectionVariables.set(\"refreshToken\", response.refreshToken);",
+                  "}",
+                  "",
+                  "pm.test(\"Response has user object\", function () {",
+                  "    pm.expect(response).to.have.property('user');",
+                  "    pm.expect(response.user).to.have.property('id');",
+                  "    pm.expect(response.user).to.have.property('email');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"admin@flcd.com\",\n    \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test(\"Response has new access token\", function () {",
+                  "    pm.expect(response).to.have.property('accessToken');",
+                  "});",
+                  "",
+                  "// Update access token",
+                  "if (response.accessToken) {",
+                  "    pm.collectionVariables.set(\"accessToken\", response.accessToken);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"refreshToken\": \"{{refreshToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/refresh-token",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "refresh-token"]
+            }
+          }
+        },
+        {
+          "name": "Get Current User Profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test(\"Response has user object\", function () {",
+                  "    pm.expect(response).to.have.property('user');",
+                  "    pm.expect(response.user).to.have.property('id');",
+                  "    pm.expect(response.user).to.have.property('email');",
+                  "    pm.expect(response.user).to.have.property('roles');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "profile"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "02. Roles & Permissions",
+      "item": [
+        {
+          "name": "Get System Modules",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test(\"Response has modules\", function () {",
+                  "    pm.expect(response).to.have.property('modules');",
+                  "    pm.expect(response.modules).to.be.an('object');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/roles/modules",
+              "host": ["{{baseUrl}}"],
+              "path": ["roles", "modules"]
+            }
+          }
+        },
+        {
+          "name": "Initialize Preset Roles",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 or 201\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/roles/initialize-presets",
+              "host": ["{{baseUrl}}"],
+              "path": ["roles", "initialize-presets"]
+            }
+          }
+        },
+        {
+          "name": "Get All Roles",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test(\"Response has roles array\", function () {",
+                  "    pm.expect(response).to.have.property('roles');",
+                  "    pm.expect(response.roles).to.be.an('array');",
+                  "});",
+                  "",
+                  "// Save a role ID for testing",
+                  "if (response.roles && response.roles.length > 0) {",
+                  "    const testRole = response.roles.find(r => r.name !== 'Super Admin');",
+                  "    if (testRole) {",
+                  "        pm.collectionVariables.set(\"testRoleId\", testRole.id);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/roles",
+              "host": ["{{baseUrl}}"],
+              "path": ["roles"]
+            }
+          }
+        },
+        {
+          "name": "Create New Role",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test(\"Response has role object\", function () {",
+                  "    pm.expect(response).to.have.property('role');",
+                  "    pm.expect(response.role).to.have.property('id');",
+                  "});",
+                  "",
+                  "// Save role ID for testing",
+                  "if (response.role) {",
+                  "    pm.collectionVariables.set(\"testRoleId\", response.role.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Test Role\",\n    \"description\": \"Test role created by Postman\",\n    \"permissions\": [\n        \"users.read\",\n        \"riders.read\",\n        \"riders.write\"\n    ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/roles",
+              "host": ["{{baseUrl}}"],
+              "path": ["roles"]
+            }
+          }
+        },
+        {
+          "name": "Update Role",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test(\"Response has updated role\", function () {",
+                  "    pm.expect(response).to.have.property('role');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Test Role Updated\",\n    \"description\": \"Updated test role\",\n    \"permissions\": [\n        \"users.read\",\n        \"riders.read\",\n        \"riders.write\",\n        \"vehicles.read\"\n    ],\n    \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/roles/{{testRoleId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["roles", "{{testRoleId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "03. User Management",
+      "item": [
+        {
+          "name": "Get All Users",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test(\"Response has users array\", function () {",
+                  "    pm.expect(response).to.have.property('users');",
+                  "    pm.expect(response.users).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["users"]
+            }
+          }
+        },
+        {
+          "name": "Create New User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test(\"Response has user object\", function () {",
+                  "    pm.expect(response).to.have.property('user');",
+                  "    pm.expect(response.user).to.have.property('id');",
+                  "});",
+                  "",
+                  "// Save user ID for testing",
+                  "if (response.user) {",
+                  "    pm.collectionVariables.set(\"testUserId\", response.user.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"testuser@flcd.com\",\n    \"password\": \"test123\",\n    \"phone\": \"+971502345678\",\n    \"firstName\": \"Test\",\n    \"lastName\": \"User\",\n    \"roleIds\": [\"{{testRoleId}}\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["users"]
+            }
+          }
+        },
+        {
+          "name": "Update User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test(\"Response has updated user\", function () {",
+                  "    pm.expect(response).to.have.property('user');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"firstName\": \"Test Updated\",\n    \"lastName\": \"User Updated\",\n    \"phone\": \"+971502345679\",\n    \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/{{testUserId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "{{testUserId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/{{testUserId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "{{testUserId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "04. Rider Management",
+      "item": [
+        {
+          "name": "Get All Riders",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test(\"Response has riders array\", function () {",
+                  "    pm.expect(response).to.have.property('riders');",
+                  "    pm.expect(response.riders).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test(\"Response has pagination\", function () {",
+                  "    pm.expect(response).to.have.property('pagination');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/riders?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["riders"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "search",
+                  "value": "john",
+                  "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "PENDING",
+                  "disabled": true
+                },
+                {
+                  "key": "employmentStatus",
+                  "value": "ACTIVE",
+                  "disabled": true
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create New Rider",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test(\"Response has rider object\", function () {",
+                  "    pm.expect(response).to.have.property('rider');",
+                  "    pm.expect(response.rider).to.have.property('id');",
+                  "    pm.expect(response.rider).to.have.property('riderCode');",
+                  "});",
+                  "",
+                  "// Save rider ID for testing",
+                  "if (response.rider) {",
+                  "    pm.collectionVariables.set(\"testRiderId\", response.rider.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"phone\": \"+971501234567\",\n    \"email\": \"john.doe@example.com\",\n    \"nationality\": \"India\",\n    \"dateOfBirth\": \"1990-01-01\",\n    \"passportNumber\": \"A1234567\",\n    \"passportExpiry\": \"2030-01-01\",\n    \"emiratesId\": \"784-1990-1234567-1\",\n    \"emiratesIdExpiry\": \"2025-01-01\",\n    \"licenseNumber\": \"DL123456\",\n    \"licenseExpiry\": \"2025-06-01\",\n    \"companySim\": \"+971501234568\",\n    \"emergencyPhone\": \"+911234567890\",\n    \"address\": \"Dubai, UAE\",\n    \"employmentStatus\": \"PENDING\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/riders",
+              "host": ["{{baseUrl}}"],
+              "path": ["riders"]
+            }
+          }
+        },
+        {
+          "name": "Get Rider Details",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test(\"Response has rider object\", function () {",
+                  "    pm.expect(response).to.have.property('rider');",
+                  "    pm.expect(response.rider).to.have.property('id');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/riders/{{testRiderId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["riders", "{{testRiderId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Rider",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test(\"Response has updated rider\", function () {",
+                  "    pm.expect(response).to.have.property('rider');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"firstName\": \"John Updated\",\n    \"lastName\": \"Doe Updated\",\n    \"employmentStatus\": \"ACTIVE\",\n    \"onboardingStatus\": \"IN_PROGRESS\",\n    \"partnerName\": \"Talabat\",\n    \"partnerCode\": \"TAL-001\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/riders/{{testRiderId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["riders", "{{testRiderId}}"]
+            }
+          }
+        },
+        {
+          "name": "Download CSV Template",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response is CSV\", function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('csv');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/riders/template",
+              "host": ["{{baseUrl}}"],
+              "path": ["riders", "template"]
+            }
+          }
+        },
+        {
+          "name": "Bulk Upload Riders",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test(\"Response has results\", function () {",
+                  "    pm.expect(response).to.have.property('results');",
+                  "    pm.expect(response.results).to.have.property('successful');",
+                  "    pm.expect(response.results).to.have.property('failed');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "csvFile",
+                  "type": "file",
+                  "src": "",
+                  "description": "CSV file with rider data"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/riders/bulk-upload",
+              "host": ["{{baseUrl}}"],
+              "path": ["riders", "bulk-upload"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "05. Document Management",
+      "item": [
+        {
+          "name": "Upload Rider Documents",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test(\"Response has uploaded documents\", function () {",
+                  "    pm.expect(response).to.have.property('uploadedDocuments');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "passport",
+                  "type": "file",
+                  "src": "",
+                  "description": "Passport document"
+                },
+                {
+                  "key": "emiratesId",
+                  "type": "file",
+                  "src": "",
+                  "description": "Emirates ID document"
+                },
+                {
+                  "key": "license",
+                  "type": "file",
+                  "src": "",
+                  "description": "License document"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/documents/riders/{{testRiderId}}/documents",
+              "host": ["{{baseUrl}}"],
+              "path": ["documents", "riders", "{{testRiderId}}", "documents"]
+            }
+          }
+        },
+        {
+          "name": "Get Rider Documents",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test(\"Response has documents array\", function () {",
+                  "    pm.expect(response).to.have.property('documents');",
+                  "    pm.expect(response.documents).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/documents/riders/{{testRiderId}}/documents",
+              "host": ["{{baseUrl}}"],
+              "path": ["documents", "riders", "{{testRiderId}}", "documents"]
+            }
+          }
+        },
+        {
+          "name": "Delete Document",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/documents/documents/:documentId",
+              "host": ["{{baseUrl}}"],
+              "path": ["documents", "documents", ":documentId"],
+              "variable": [
+                {
+                  "key": "documentId",
+                  "value": "document-id-here"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "06. Email Configuration",
+      "item": [
+        {
+          "name": "Get Email Configurations",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test(\"Response has email configurations\", function () {",
+                  "    pm.expect(response).to.have.property('emailConfigurations');",
+                  "    pm.expect(response.emailConfigurations).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/email-config",
+              "host": ["{{baseUrl}}"],
+              "path": ["email-config"]
+            }
+          }
+        },
+        {
+          "name": "Create Email Configuration",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test(\"Response has email configuration\", function () {",
+                  "    pm.expect(response).to.have.property('emailConfiguration');",
+                  "    pm.expect(response.emailConfiguration).to.have.property('id');",
+                  "});",
+                  "",
+                  "// Save email config ID for testing",
+                  "if (response.emailConfiguration) {",
+                  "    pm.collectionVariables.set(\"testEmailConfigId\", response.emailConfiguration.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"host\": \"smtp.gmail.com\",\n    \"port\": 587,\n    \"secure\": false,\n    \"username\": \"test@gmail.com\",\n    \"password\": \"app-specific-password\",\n    \"fromEmail\": \"noreply@flcd.com\",\n    \"fromName\": \"FLCD Platform\",\n    \"testEmail\": \"test@example.com\",\n    \"isDefault\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/email-config",
+              "host": ["{{baseUrl}}"],
+              "path": ["email-config"]
+            }
+          }
+        },
+        {
+          "name": "Test Email Configuration",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test(\"Response has test result\", function () {",
+                  "    pm.expect(response).to.have.property('testResult');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"testEmail\": \"test@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/email-config/{{testEmailConfigId}}/test",
+              "host": ["{{baseUrl}}"],
+              "path": ["email-config", "{{testEmailConfigId}}", "test"]
+            }
+          }
+        },
+        {
+          "name": "Set Email Config as Default",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/email-config/{{testEmailConfigId}}/set-default",
+              "host": ["{{baseUrl}}"],
+              "path": ["email-config", "{{testEmailConfigId}}", "set-default"]
+            }
+          }
+        },
+        {
+          "name": "Update Email Configuration",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"host\": \"smtp.gmail.com\",\n    \"port\": 587,\n    \"secure\": false,\n    \"username\": \"updated@gmail.com\",\n    \"fromEmail\": \"updated@flcd.com\",\n    \"fromName\": \"FLCD Platform Updated\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/email-config/{{testEmailConfigId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["email-config", "{{testEmailConfigId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Email Configuration",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/email-config/{{testEmailConfigId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["email-config", "{{testEmailConfigId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "07. Dashboard Stats",
+      "item": [
+        {
+          "name": "Get Dashboard Statistics",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test(\"Response has stats\", function () {",
+                  "    pm.expect(response).to.have.property('stats');",
+                  "    pm.expect(response.stats).to.have.property('totalRiders');",
+                  "    pm.expect(response.stats).to.have.property('activeRiders');",
+                  "    pm.expect(response.stats).to.have.property('totalVehicles');",
+                  "    pm.expect(response.stats).to.have.property('totalRequests');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/dashboard/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["dashboard", "stats"]
+            }
+          }
+        },
+        {
+          "name": "Get Recent Activities",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const response = pm.response.json();",
+                  "",
+                  "pm.test(\"Response has activities\", function () {",
+                  "    pm.expect(response).to.have.property('activities');",
+                  "    pm.expect(response.activities).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/dashboard/recent-activities",
+              "host": ["{{baseUrl}}"],
+              "path": ["dashboard", "recent-activities"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "08. Cleanup",
+      "item": [
+        {
+          "name": "Delete Test Rider",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/riders/{{testRiderId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["riders", "{{testRiderId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Test Role",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/roles/{{testRoleId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["roles", "{{testRoleId}}"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -158,6 +158,43 @@ const PRESET_ROLES = {
   }
 };
 
+/**
+ * @swagger
+ * /roles/modules:
+ *   get:
+ *     summary: Get system modules and permissions
+ *     description: Retrieve all available system modules and their permissions for role creation
+ *     tags: [Roles]
+ *     responses:
+ *       200:
+ *         description: System modules retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 modules:
+ *                   type: object
+ *                   additionalProperties:
+ *                     type: object
+ *                     properties:
+ *                       name:
+ *                         type: string
+ *                       permissions:
+ *                         type: array
+ *                         items:
+ *                           type: string
+ *                 presetRoles:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
 // Get all system modules and permissions
 router.get('/modules', async (req, res) => {
   try {
@@ -171,6 +208,32 @@ router.get('/modules', async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /roles:
+ *   get:
+ *     summary: Get all roles
+ *     description: Retrieve all roles with their permissions and user counts
+ *     tags: [Roles]
+ *     responses:
+ *       200:
+ *         description: Roles retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 roles:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Role'
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
 // Get all roles
 router.get('/', async (req, res) => {
   try {
@@ -245,6 +308,42 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /roles:
+ *   post:
+ *     summary: Create new role
+ *     description: Create a new role with specified permissions
+ *     tags: [Roles]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/CreateRoleRequest'
+ *           example:
+ *             name: "Manager"
+ *             description: "Department manager with limited access"
+ *             permissions: ["users.read", "riders.read", "riders.write"]
+ *     responses:
+ *       201:
+ *         description: Role created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 role:
+ *                   $ref: '#/components/schemas/Role'
+ *       400:
+ *         description: Role already exists or validation error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
 // Create new role
 router.post('/', async (req, res) => {
   try {
