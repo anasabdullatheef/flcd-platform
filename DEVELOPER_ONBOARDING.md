@@ -2,9 +2,9 @@
 
 ## 👋 **Welcome to FLCD Platform Development Team!**
 
-**Project**: Fleet Logistics and Compliance Dashboard  
-**Timeline**: 10 working days (June 9-20, 2025)  
-**Team**: 2 Developers + Assistant  
+**Project**: Fleet Logistics and Compliance Dashboard
+**Timeline**: 10 working days (June 9-20, 2025)
+**Team**: 2 Developers + Assistant
 
 ---
 
@@ -13,10 +13,10 @@
 ### **Developer 1** (Backend + Frontend Specialist)
 - **Primary**: Node.js, Express, Prisma, PostgreSQL, Next.js, React
 - **Sprint 1**: Database + Authentication system
-- **Sprint 2**: Rider management + Vehicle management  
+- **Sprint 2**: Rider management + Vehicle management
 - **Sprint 3**: Integration + Testing
 
-### **Developer 2** (Mobile + Integration Specialist) 
+### **Developer 2** (Mobile + Integration Specialist)
 - **Email**: amina@hashinclu.de ⚠️ **PENDING REPOSITORY ACCESS**
 - **Primary**: Android, Kotlin, Jetpack Compose, Location Services
 - **Sprint 1**: Frontend dashboard setup (BLOCKED - awaiting access)
@@ -110,7 +110,7 @@ cd flcd-mobile
 ### **Daily Routine**:
 1. **Morning Standup** (15 mins):
    - Yesterday's completed tasks
-   - Today's planned work  
+   - Today's planned work
    - Any blockers or dependencies
 
 2. **GitHub Updates**:
@@ -255,5 +255,5 @@ gh pr create --title "Add JWT authentication system" --body "Closes #1"
 
 **🚀 Let's build an amazing FLCD platform together!**
 
-**Need help?** Check documentation or ask in GitHub issues.  
+**Need help?** Check documentation or ask in GitHub issues.
 **Ready to start?** Follow the Quick Start Setup above.

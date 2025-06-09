@@ -130,7 +130,7 @@ Since GitHub CLI requires interactive authentication for Projects, follow these 
 ### **Step 2: Configure Columns**
 Replace default columns with:
 1. 📋 Backlog
-2. 🔄 Sprint Planning  
+2. 🔄 Sprint Planning
 3. 🚀 In Progress
 4. 👀 In Review
 5. 🧪 Testing
@@ -146,7 +146,7 @@ Replace default columns with:
    - Developer (Single select): Developer 1, Developer 2
 
 ### **Step 4: Add Existing Issues**
-1. Click "Add items" 
+1. Click "Add items"
 2. Select all 7 existing issues (#1-#7)
 3. Configure each issue:
    - Set Sprint based on milestone
@@ -156,7 +156,7 @@ Replace default columns with:
 
 ### **Step 5: Create Views**
 1. **Sprint Overview**: Group by Sprint → Status
-2. **Developer Workload**: Group by Developer → Status  
+2. **Developer Workload**: Group by Developer → Status
 3. **Component Progress**: Group by Component → Status
 4. **Current Sprint**: Filter current sprint only
 

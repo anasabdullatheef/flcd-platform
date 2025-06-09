@@ -119,7 +119,7 @@ app/src/main/java/com/flcd/rider/
 users, roles, permissions, user_roles
 riders, rider_documents, rider_acknowledgments
 
--- Week 4  
+-- Week 4
 vehicles, vehicle_assignments, vehicle_documents
 earnings, deductions, traffic_fines
 

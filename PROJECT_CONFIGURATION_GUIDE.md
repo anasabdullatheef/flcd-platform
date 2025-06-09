@@ -1,8 +1,8 @@
 # GitHub Project Configuration Guide
 
 ## ✅ Project Created Successfully!
-**Project**: FLCD Platform Development  
-**ID**: PVT_kwHOA727a84A6-r8  
+**Project**: FLCD Platform Development
+**ID**: PVT_kwHOA727a84A6-r8
 **URL**: https://github.com/users/anasabdullatheef/projects/1
 
 ---
@@ -18,7 +18,7 @@
 1. Click the **"+"** button in the column headers
 2. Select **"Single select"**
 3. **Field name**: `Sprint`
-4. **Options**: 
+4. **Options**:
    - `Sprint 1: Foundation (Days 1-3)`
    - `Sprint 2: Core Development (Days 4-7)`
    - `Sprint 3: Integration & Delivery (Days 8-10)`
@@ -29,7 +29,7 @@
 2. **Field name**: `Priority`
 3. **Options**:
    - `High` (🔴 Red)
-   - `Medium` (🟡 Yellow) 
+   - `Medium` (🟡 Yellow)
    - `Low` (🟢 Green)
 4. Click **"Save"**
 

@@ -8,11 +8,11 @@ async function testConnection() {
     console.log('Testing database connection...');
     await prisma.$connect();
     console.log('✅ Database connection successful');
-    
+
     // Test basic query
     const userCount = await prisma.user.count();
     console.log(`📊 Users in database: ${userCount}`);
-    
+
     await prisma.$disconnect();
     console.log('✅ Database test completed');
   } catch (error) {

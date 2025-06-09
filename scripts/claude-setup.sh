@@ -121,7 +121,7 @@ if [ "$OS" = "macos" ]; then
         createuser -s $DB_USER 2>/dev/null || print_warning "User creation may have failed"
         print_status "Database user $DB_USER created"
     fi
-    
+
     if psql -lqt | cut -d \| -f 1 | grep -qw $DB_NAME; then
         print_status "Database $DB_NAME already exists"
     else
@@ -153,7 +153,7 @@ if [ ! -f ".env" ]; then
     else
         DATABASE_URL="postgresql://$DB_USER:$DB_PASS@localhost:5432/$DB_NAME?schema=public"
     fi
-    
+
     cat > .env << EOF
 # Database
 DATABASE_URL="$DATABASE_URL"

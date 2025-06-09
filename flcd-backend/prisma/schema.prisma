@@ -25,6 +25,7 @@ model User {
   // Relationships
   userRoles UserRole[]
   createdRiders Rider[] @relation("CreatedBy")
+  adminAcknowledgements Acknowledgement[] @relation("AdminAcknowledgements")
   
   @@map("users")
 }
@@ -89,25 +90,50 @@ model RolePermission {
 model Rider {
   id                String    @id @default(cuid())
   riderCode         String    @unique
+  
+  // Personal Info
   firstName         String
   lastName          String
+  phone             String    @unique // Personal Phone Number
   email             String?   @unique
-  phone             String    @unique
-  dateOfBirth       DateTime?
   nationality       String?
-  emiratesId        String?   @unique
+  dateOfBirth       DateTime?
+  
+  // Identity & Compliance
   passportNumber    String?   @unique
-  visaNumber        String?
+  passportExpiry    DateTime?
+  emiratesId        String?   @unique
+  emiratesIdExpiry  DateTime?
   licenseNumber     String?   @unique
   licenseExpiry     DateTime?
-  emergencyContact  String?
-  emergencyPhone    String?
-  address           String?
+  
+  // Contact Numbers
+  companySim        String?   // Company SIM Number (Assigned SIM)
+  emergencyPhone    String?   // Emergency Phone Number
+  
+  // Other Info
+  languageSpoken    String?
+  cityOfWork        String?
+  joiningDate       DateTime?
+  profilePicture    String?   // File path to profile picture
+  bloodGroup        String?
+  insurancePartner  String?   // Insurance partner name
+  insuranceExpiry   DateTime?
+  healthNotes       String?   // Health related notes
+  adminNotes        String?   // Admin notes
+  
+  // Partner & Employment
+  employeeId        String?   // Employee ID
+  deliveryPartner   String?   // Delivery Partner Name (Talabat, Careem, etc)
+  deliveryPartnerId String?   // Delivery Partner ID
+  
+  // Status & Legacy Fields
   employmentStatus  RiderEmploymentStatus @default(PENDING)
-  partnerName       String?
-  partnerCode       String?
   onboardingStatus  OnboardingStatus @default(PENDING)
   isActive          Boolean   @default(true)
+  address           String?   // Legacy address field
+  
+  // System Fields
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
   createdById       String
@@ -116,6 +142,7 @@ model Rider {
   createdBy            User                   @relation("CreatedBy", fields: [createdById], references: [id])
   documents            RiderDocument[]
   acknowledgments      RiderAcknowledgment[]
+  generatedAcknowledgements Acknowledgement[]
   vehicleAssignments   VehicleAssignment[]
   earnings             Earnings[]
   deductions           Deduction[]
@@ -165,9 +192,12 @@ enum DocumentType {
   PASSPORT
   VISA
   DRIVING_LICENSE
+  WORK_PERMIT
+  INSURANCE
   PROFILE_PHOTO
   EMPLOYMENT_CONTRACT
   BANK_DETAILS
+  OTHER_DOCUMENT
 }
 
 enum DocumentStatus {
@@ -514,4 +544,33 @@ enum TicketStatus {
   RESOLVED
   CLOSED
   REOPENED
+}
+
+// Generated Acknowledgements (for Visa, SIM, etc.)
+model Acknowledgement {
+  id                      String               @id @default(cuid())
+  riderId                 String
+  adminId                 String
+  type                    AcknowledgementType
+  acknowledgement_description String
+  fileName                String
+  filePath                String
+  fileType                String
+  isPreSigned            Boolean              @default(true)
+  createdAt              DateTime             @default(now())
+  updatedAt              DateTime             @updatedAt
+
+  // Relationships
+  rider Rider @relation(fields: [riderId], references: [id], onDelete: Cascade)
+  admin User  @relation("AdminAcknowledgements", fields: [adminId], references: [id])
+  
+  @@map("acknowledgements")
+}
+
+enum AcknowledgementType {
+  VISA
+  SIM
+  EQUIPMENT
+  TRAINING
+  OTHER
 }

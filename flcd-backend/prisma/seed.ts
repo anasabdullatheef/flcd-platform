@@ -60,7 +60,7 @@ async function main() {
 
   // Create Super Admin user
   const hashedPassword = await bcrypt.hash('admin123', 10);
-  
+
   const superAdmin = await prisma.user.upsert({
     where: { email: 'admin@flcd.com' },
     update: {},
@@ -100,7 +100,7 @@ async function main() {
 
   // Assign all permissions to Super Admin role
   const allPermissions = await prisma.permission.findMany();
-  
+
   for (const permission of allPermissions) {
     await prisma.rolePermission.upsert({
       where: {

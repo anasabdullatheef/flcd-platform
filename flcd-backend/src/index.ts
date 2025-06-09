@@ -9,13 +9,16 @@ import dotenv from 'dotenv';
 import authRoutes from './routes/auth';
 import userRoutes from './routes/users';
 import riderRoutes from './routes/riders';
+import roleRoutes from './routes/roles';
+import documentRoutes from './routes/documents';
+import testUploadRoutes from './routes/test-upload';
 
 // Load environment variables
 dotenv.config();
 
 // Initialize Express app
 const app = express();
-const port = process.env.PORT || 3000;
+const port = parseInt(process.env.PORT || '3000', 10);
 
 // Initialize Prisma Client
 export const prisma = new PrismaClient();
@@ -31,6 +34,13 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/riders', riderRoutes);
+app.use('/api/roles', roleRoutes);
+app.use('/api/documents', documentRoutes);
+app.use('/api/test', testUploadRoutes);
+
+// Serve test upload page and uploads directory
+app.use(express.static('.'));
+app.use('/uploads', express.static('uploads'));
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -50,7 +60,8 @@ app.get('/', (req, res) => {
       health: '/health',
       auth: '/api/auth',
       users: '/api/users',
-      riders: '/api/riders'
+      riders: '/api/riders',
+      roles: '/api/roles'
     }
   });
 });
@@ -83,10 +94,11 @@ async function startServer() {
     await prisma.$connect();
     console.log('✅ Database connected successfully');
 
-    app.listen(port, () => {
+    app.listen(port, '0.0.0.0', () => {
       console.log(`🚀 FLCD Backend API running on port ${port}`);
       console.log(`📍 Health check: http://localhost:${port}/health`);
       console.log(`📍 API docs: http://localhost:${port}/`);
+      console.log(`📍 Server binding: 0.0.0.0:${port}`);
     });
   } catch (error) {
     console.error('❌ Failed to start server:', error);

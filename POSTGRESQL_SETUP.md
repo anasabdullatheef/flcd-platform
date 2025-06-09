@@ -55,7 +55,7 @@ Edit `.env` file with your database credentials:
 # Database Configuration
 DATABASE_URL="postgresql://flcd_admin:your_password@localhost:5432/flcd_platform?schema=public"
 
-# JWT Configuration  
+# JWT Configuration
 JWT_SECRET="your-super-secret-jwt-key-change-in-production"
 JWT_REFRESH_SECRET="your-super-secret-refresh-key-change-in-production"
 JWT_EXPIRES_IN="1h"
@@ -121,7 +121,7 @@ curl http://localhost:3000/health
 # Test authentication routes
 curl http://localhost:3000/api/auth/login
 
-# Test user routes  
+# Test user routes
 curl http://localhost:3000/api/users
 
 # Test rider routes
@@ -190,7 +190,7 @@ npx prisma migrate reset --force
 ## 📈 **Next Steps After Setup**
 
 1. ✅ **Database Running**: PostgreSQL service active
-2. ✅ **Backend Connected**: Server starts without errors  
+2. ✅ **Backend Connected**: Server starts without errors
 3. ✅ **Admin User Created**: Can login with default credentials
 4. 🔄 **Continue Development**: Implement authentication endpoints
 5. 🔄 **Frontend Setup**: Begin Next.js dashboard development

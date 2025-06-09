@@ -9,7 +9,7 @@ I failed to add amina@hashinclu.de as collaborator through CLI. Here are the man
 ### Step 1: Add Collaborator via GitHub Web
 1. Go to: https://github.com/anasabdullatheef/flcd-platform
 2. Click **Settings** tab
-3. Click **Collaborators** in left sidebar  
+3. Click **Collaborators** in left sidebar
 4. Click **Add people**
 5. Enter: **amina@hashinclu.de**
 6. Select **Write** permission

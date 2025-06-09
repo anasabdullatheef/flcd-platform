@@ -28,7 +28,7 @@ flcd-platform/
 3. **Location & Safety Services** - Real-time tracking + geofencing + SOS
 4. **Mobile App Core** - Android application for riders
 
-### Medium Priority  
+### Medium Priority
 5. **Vehicle Management** - Fleet management + maintenance tracking
 6. **Financial Management** - Earnings + deductions + reporting
 7. **Communication & Support** - Tickets + knowledge base + notifications
@@ -82,7 +82,7 @@ brew services start postgresql@15
 createuser --interactive --pwprompt flcd_admin
 createdb -O flcd_admin flcd_platform
 
-# Ubuntu/Linux  
+# Ubuntu/Linux
 sudo apt install postgresql postgresql-contrib
 sudo -u postgres createuser --interactive --pwprompt flcd_admin
 sudo -u postgres createdb -O flcd_admin flcd_platform
@@ -107,7 +107,7 @@ npm run seed
 npm run dev
 ```
 
-#### 4. Frontend Setup  
+#### 4. Frontend Setup
 ```bash
 cd flcd-frontend
 
@@ -158,7 +158,7 @@ curl http://localhost:3000/health
 - **File Upload**: Multer + Cloud Storage
 
 ### Frontend
-- **Framework**: Next.js 14 with TypeScript  
+- **Framework**: Next.js 14 with TypeScript
 - **UI**: Tailwind CSS + Shadcn/ui
 - **State Management**: Zustand
 - **Maps**: Google Maps API
@@ -175,7 +175,7 @@ curl http://localhost:3000/health
 
 1. Check GitHub Issues for available tasks
 2. Create feature branch from `develop`
-3. Follow module-based development approach  
+3. Follow module-based development approach
 4. Submit PR with comprehensive testing
 
 ## License

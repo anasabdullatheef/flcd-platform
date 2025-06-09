@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Document Upload Test</title>
+</head>
+<body>
+    <h1>Document Upload Test</h1>
+    
+    <h2>Test 1: Simple Local Upload</h2>
+    <form id="testForm" enctype="multipart/form-data">
+        <input type="file" id="testFile" name="testFile" required>
+        <button type="submit">Test Upload</button>
+    </form>
+    
+    <h2>Test 2: Rider Document Upload</h2>
+    <form id="riderForm" enctype="multipart/form-data">
+        <label>Rider ID: <input type="text" id="riderId" value="test-rider-id" required></label><br><br>
+        <label>Passport: <input type="file" id="passport" name="passport"></label><br>
+        <label>Emirates ID: <input type="file" id="emiratesId" name="emiratesId"></label><br>
+        <button type="submit">Upload Documents</button>
+    </form>
+    
+    <div id="results"></div>
+
+    <script>
+        // Test form 1
+        document.getElementById('testForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            console.log('Test form submitted');
+            
+            const fileInput = document.getElementById('testFile');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Please select a file');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('testFile', file);
+            
+            try {
+                console.log('Making test upload request...');
+                const response = await fetch('http://localhost:3000/api/test/test-upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                console.log('Test upload result:', result);
+                document.getElementById('results').innerHTML += '<h3>Test Upload Result:</h3><pre>' + JSON.stringify(result, null, 2) + '</pre>';
+            } catch (error) {
+                console.error('Test upload error:', error);
+                document.getElementById('results').innerHTML += '<h3>Test Upload Error:</h3><pre>' + error.message + '</pre>';
+            }
+        });
+        
+        // Rider form
+        document.getElementById('riderForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            console.log('Rider form submitted');
+            
+            const riderId = document.getElementById('riderId').value;
+            const passport = document.getElementById('passport').files[0];
+            const emiratesId = document.getElementById('emiratesId').files[0];
+            
+            if (!passport && !emiratesId) {
+                alert('Please select at least one document');
+                return;
+            }
+            
+            const formData = new FormData();
+            if (passport) formData.append('passport', passport);
+            if (emiratesId) formData.append('emiratesId', emiratesId);
+            
+            try {
+                console.log('Making rider document upload request...');
+                const response = await fetch(`http://localhost:3000/api/documents/riders/${riderId}/documents`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                console.log('Rider upload result:', result);
+                document.getElementById('results').innerHTML += '<h3>Rider Upload Result:</h3><pre>' + JSON.stringify(result, null, 2) + '</pre>';
+            } catch (error) {
+                console.error('Rider upload error:', error);
+                document.getElementById('results').innerHTML += '<h3>Rider Upload Error:</h3><pre>' + error.message + '</pre>';
+            }
+        });
+    </script>
+</body>
+</html>
